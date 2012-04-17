@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks
+END
+add.py
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks/add.py
+END
+uninstall.py
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks/uninstall.py
+END
+remove.py
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks/remove.py
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks/README
+END
+install.py
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/projects/Appcelerator/!svn/ver/283/Geoloqi/Module/iOS/GeoloqiModule/hooks/install.py
+END
