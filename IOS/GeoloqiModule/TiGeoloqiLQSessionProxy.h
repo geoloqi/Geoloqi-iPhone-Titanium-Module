@@ -9,11 +9,9 @@
 
 @interface TiGeoloqiLQSessionProxy : TiProxy <RequestHelperDelegate> 
 {
-    BOOL isServiceStartedSuccessFully;
-    NSString *strAuthenicatedUserName;
-    
+
 }
 
 @property (nonatomic,retain)     RequestHelper *objRequestHelper;
-@property (nonatomic,retain)     NSString *strAuthenicatedUserName;
+
 @end

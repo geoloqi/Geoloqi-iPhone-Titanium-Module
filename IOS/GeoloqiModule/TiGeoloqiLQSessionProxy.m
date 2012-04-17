@@ -13,7 +13,6 @@
 @implementation TiGeoloqiLQSessionProxy
 
 @synthesize objRequestHelper;
-@synthesize strAuthenicatedUserName;
 
 
 #pragma mark-
@@ -35,9 +34,6 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
     
-    strAuthenicatedUserName =   CONST_EMPTY_STRING;    
-    
-    isServiceStartedSuccessFully    =   NO;
     
     NSString *strAPIKey     =   [Utils getStringValueForDict:properties fromKey:CONST_GEOLOQI_SERVICE_API_KEY];
     NSString *strAPISecret  =   [Utils getStringValueForDict:properties fromKey:CONST_GEOLOQI_SERVICE_API_SECRET];
@@ -56,10 +52,6 @@
     }
     else
     {
-        isServiceStartedSuccessFully    =   YES;
-        //%s@"TiGeoloqiLQSessionProxy::IF API SECRET OR KEY IS OK");  
-       // objRequestHelper        =   [[RequestHelper alloc] initWithDelegate:self];
-        
         [self.objRequestHelper setAPIKey:strAPIKey secret:strAPISecret];
     }
 }
@@ -77,7 +69,11 @@
 {
     if (self=[super init])
     {
-       objRequestHelper        =   [[RequestHelper alloc] initWithDelegate:self];
+        RequestHelper *objReqHelper   =   [[RequestHelper alloc] initWithDelegate:self];   
+        self.objRequestHelper         =   objReqHelper;
+        
+        [objReqHelper release];
+        objReqHelper    =   nil;
     }
    
     return self;
@@ -167,9 +163,6 @@
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
-
-    
-   return strAuthenicatedUserName;
 }
 
 //==========================================================================================
@@ -429,7 +422,7 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
 
-    TiGeoloqiLQSessionProxy *newProxy  =   [[TiGeoloqiLQSessionProxy alloc] init];
+    TiGeoloqiLQSessionProxy *newProxy  =   [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
     
     [newProxy.objRequestHelper setObjSession:[LQSession savedSession]];
     
@@ -461,7 +454,7 @@
 
     if (session!=nil)
     {
-        newProxy   =   [[TiGeoloqiLQSessionProxy alloc] init];// autorelease];
+        newProxy   =   [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
         [newProxy.objRequestHelper setObjSession:session];
     }
     
@@ -575,9 +568,6 @@
 }
 
 
-
-
-
 #pragma pragma mark-
 #pragma mark Memory Methods
 //==========================================================================================
@@ -596,9 +586,8 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
 
+    RELEASE_TO_NIL(self.objRequestHelper);
     
-    RELEASE_TO_NIL(strAuthenicatedUserName);
-    RELEASE_TO_NIL(objRequestHelper);
     [super dealloc];
 }
 
@@ -663,7 +652,6 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
 
-    
     TiApp *appObject = [[TiApp alloc]init];
     [LQSession application:(UIApplication*)[TiApp app] didFinishLaunchingWithOptions:[appObject launchOptions]];
     [appObject release];

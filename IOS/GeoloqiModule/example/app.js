@@ -151,18 +151,17 @@ var testButton2   =   Titanium.UI.createButton({
 window.add(testButton2);
 
 testButton2.addEventListener('click',function(){
-                             label.text =    'Loading...';
+                             //label.text =    'Loading...';
                              //geoloqiSessionProxy2.runGetRequest('/account/profile');
                              
-                             //geoloqiSessionProxy2.setSavedSession(geoloqiSessionProxy1);
-                            
-                             //geoloqiSessionProxy2.savedSession().runGetRequest('/account/profile');
+//                             geoloqiSessionProxy2.setSavedSession(geoloqiSessionProxy1);
+//                            
+//                             geoloqiSessionProxy2.savedSession().runGetRequest('/account/profile');
                              
                              
-                             var newProxyWithAccessToken    =   geoloqiSessionProxy2.sessionWithAccessToken('ab83-c2fea55f2b6c00767771daeafbf388a75e13c3da');
+                             var newProxyWithAccessToken    =   geoloqiSessionProxy2.sessionWithAccessToken(geoloqiSessionProxy1.getAccessToken());
                              
                              newProxyWithAccessToken.runGetRequest('/account/profile');
-                             
                              
                              });
 

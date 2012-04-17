@@ -210,12 +210,10 @@
         {
             NSLog(@"makeRequest:[ERROR] %@",[error localizedDescription]);
             [m_delegate requestCompleteWithError:error];
-            // [self fireEvent:@"requestFailed" withObject:[self getDictionaryFromErrorObject:error]];
         }
         else
         {
             [m_delegate requestCompleteWithSuccess:responseDictionary];
-            //[self fireEvent:@"requestCompleted" withObject:responseDictionary];
         }
 	}];
 }
