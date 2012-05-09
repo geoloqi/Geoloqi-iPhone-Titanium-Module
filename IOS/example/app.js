@@ -1,4 +1,3 @@
- 
 // This is a test harness for your module
 // You should do something interesting in this harness 
 // to test out the module and to provide instructions 
@@ -9,281 +8,195 @@ var window = Ti.UI.createWindow({
                                 backgroundColor:'white'
                                 });
 
-var geoloqi = require('ti.geoloqi');
-geoloqi.setDebug(true);
-
-geoloqi.addEventListener('onValidate',function(e){
-                              //alert("Request completed");
-                              alert("[Validation Error] " + e.response.error_description);
-                              });  
-
 var scrollViewer = Ti.UI.createScrollView({
                                           contentWidth: 'auto',
-                                          contentHeight: 1000,
-                                          width: 1024,
-                                          //height: 400,
+                                          contentHeight: 1500,
                                           backgroundColor: '#c5c5c5',
-                                          showVerticalScrollIndicator:true,
-                                          showHorizontalScrollIndicator:false,
-                                          zIndex: 10
+                                          // showVerticalScrollIndicator:true,
+                                          // showHorizontalScrollIndicator:true,
                                           });
 
+window.add(scrollViewer);
 
-// android specific
-if (Ti.Platform.name == "android") {
-    var extras = {
-    EXTRA_SDK_ID: "b272bc7b3add8b4cb32a0c9b222ab6c4",
-    EXTRA_SDK_SECRET: "db9181529c7922e6d23764c4614966b4",
-    EXTRA_USERNAME: "sapan.varshney@globallogic.com",
-    EXTRA_PASSWORD: "S@pan123"
-    }
-    geoloqi.startLQService("ACTION_AUTH_USER",extras);
-}
+window.open();
+
+var geoloqi = require('ti.geoloqi');
+
+var objSession;
+
+geoloqi.init({
+             clientId: "b272bc7b3add8b4cb32a0c9b222ab6c4",
+             clientSecret: "db9181529c7922e6d23764c4614966b4",
+             trackingProfile: "OFF",
+             lowBatteryTracking: true,
+             allowAnonymousUsers:true
+             },
+             {
+             onSuccess:function(e)
+             {
+             objSession =   geoloqi.session;
+             
+             alert(objSession.getUserId());
+             },
+             onFailure:function(e)
+             {
+             alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+             }
+             }
+             );
 
 
+//EVENT LISTNERS
+geoloqi.addEventListener('onValidate',function(e){
+                         //alert("Request completed");
+                         alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                         });  
 
-var getAccessToken=Ti.UI.createButton({
-                                                 title:'Get Access Token',
-                                                 top:5,
-                                                 height:30,
-                                                 width:200
-                                                 });
+var btnAutheticateUser=Ti.UI.createButton({
+                                          title:'Authenticate user',
+                                          top:5,
+                                          height:30,
+                                          width:200
+                                          });
+
+btnAutheticateUser.addEventListener('click',function(){
+                                    geoloqi.authenticateUser('t.sharma@globallogic.com',
+                                                             '12344321',
+                                                             {
+                                                             onSuccess:function(e)
+                                                             {
+                                                             alert(e);
+                                                             },
+                                                             onFailure:function(e)
+                                                             {
+                                                             alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                             }
+                                                             }
+                                                             );
+                                    });
 
 
-var buttonIsPushEnabled=Ti.UI.createButton({
-                                           title:'Is Push Disabled',
-                                           top:60,
-                                           height:30,
-                                           width:200
-                                           });
+scrollViewer.add(btnAutheticateUser);
 
-var buttonSetPushEnabled=Ti.UI.createButton({
-                                            title:'Set Push Disbled',
-                                            top:120,
-                                            height:30,
-                                            width:200
-                                            });
 
-var buttonGetUserName=Ti.UI.createButton({
-                                         title:'Get UserID',
-                                         top:180,
-                                         height:30,
-                                         width:200
-                                         });
+var btnAnonUser=Ti.UI.createButton({
+                                   title:'Create Anon User',
+                                   top:40,
+                                   height:30,
+                                   width:200
+                                   });
 
-var buttonIsAnonymus=Ti.UI.createButton({
-                                        title:'Is Anonymous',
-                                        top:240,
-                                        height:30,
-                                        width:200
-                                        });
+btnAnonUser.addEventListener('click',function(){
+                             geoloqi.createAnonymousUser({},{
+                                                         onSuccess:function(e)
+                                                         {
+                                                         alert(e);
+                                                         },
+                                                         onFailure:function(e)
+                                                         {
+                                                         alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                         }
+                                                         });
+                             });
 
-var buttonCreateAccountWithAnonymusUser=Ti.UI.createButton({
-                                                           title:'Create Anonymous User',
-                                                           top:300,
-                                                           height:30,
-                                                           width:200
-                                                           });
 
-var buttonCreateAccountWithUserName=Ti.UI.createButton({
-                                                       title:'Create Account With UserName',
-                                                       top:360,
-                                                       height:30,
-                                                       width:200
-                                                       });
+scrollViewer.add(btnAnonUser);
 
-var buttonAuthenticateUser=Ti.UI.createButton({
-                                              title:'Authenticate User',
-                                              top:420,
-                                              height:30,
-                                              width:200
-                                              });
+var btnCreateUser=Ti.UI.createButton({
+                                     title:'Create User',
+                                     top:75,
+                                     height:30,
+                                     width:200
+                                     });
 
-var buttonregisterDeviceToken=Ti.UI.createButton({
-                                                 title:'Register Device User',
-                                                 top:480,
-                                                 height:30,
-                                                 width:200
-                                                 });
+btnCreateUser.addEventListener('click',function(){
+                               geoloqi.createUser({username:"tarunksharma",password:"12344321"},{
+                                                  onSuccess:function(e)
+                                                  {
+                                                  alert(e);
+                                                  },
+                                                  onFailure:function(e)
+                                                  {
+                                                  alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                  }
+                                                  });
+                               });
 
-var buttonRunGetrequest=Ti.UI.createButton({
-                                           title:'Run Get Request',
-                                           top:540,
-                                           height:30,
-                                           width:200
-                                           });
 
-var buttonrunPostRequestWithJSONObject=Ti.UI.createButton({
-                                                          title:'Run Post Request(Object)',
-                                                          top:600,
-                                                          height:30,
-                                                          width:200
+scrollViewer.add(btnCreateUser);
+
+
+var btnGetUserId=Ti.UI.createButton({
+                                    title:'Get UserID',
+                                    top:110,
+                                    height:30,
+                                    width:200
+                                    });
+
+btnGetUserId.addEventListener('click',function(){
+                              var userID    =   geoloqi.session.getUserId();
+                              alert("user id "+ userID);
+                              });
+
+scrollViewer.add(btnGetUserId);
+
+var btnAPIRequest=Ti.UI.createButton({
+                                     title:'apiRequest',
+                                     top:150,
+                                     height:30,
+                                     width:200
+                                     });
+
+btnAPIRequest.addEventListener('click',function(){
+                               objSession.apiRequest("GET","account/profile",{},
+                                                          {
+                                                          onSuccess:function(e)
+                                                          {
+                                                          alert(e);
+                                                          },
+                                                          onFailure:function(e)
+                                                          {
+                                                          alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                          }
                                                           });
+                               
+                               });
 
-var runPostRequestWithJSONArray=Ti.UI.createButton({
-                                                   title:'Run Post Request(Array)',
-                                                   top:660,
-                                                   height:30,
-                                                   width:200
-                                                   });
+scrollViewer.add(btnAPIRequest);
 
-var runAPI=Ti.UI.createButton({
-                              title:'Run API',
-                              top:720,
+var btnPost=Ti.UI.createButton({
+                               title:'POST',
+                               top:185,
+                               height:30,
+                               width:200
+                               });
+
+btnPost.addEventListener('click',function(){
+                         geoloqi.session.postRequest("link/create",{description:"this is test link"},
+                                                     {
+                                                     onSuccess:function(e)
+                                                     {
+                                                     alert(e);
+                                                     },
+                                                     onFailure:function(e)
+                                                     {
+                                                     alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                     }
+                                                     });
+                         
+                         });
+
+scrollViewer.add(btnPost);
+
+
+var btnGet=Ti.UI.createButton({
+                              title:'GET',
+                              top:220,
                               height:30,
                               width:200
                               });
-
-var buttonformatTimeStamp=Ti.UI.createButton({
-                                             title:'Format TimeStamp',
-                                             top:780,
-                                             height:30,
-                                             width:200
-                                             });
-
-var sessionProxy=geoloqi.createLQSession({
-                                         apiKey:"b272bc7b3add8b4cb32a0c9b222ab6c4",
-                                         apiSecret: "db9181529c7922e6d23764c4614966b4"
-                                         });
-
-
-getAccessToken.addEventListener('click',function(){
-                                           var result=sessionProxy.getAccessToken();
-                                           alert(result);
-                                           });
-
-buttonIsPushEnabled.addEventListener('click',function(){
-                                     var result=geoloqi.pushDisabled();
-                                     alert(result);
-                                     });
-
-buttonSetPushEnabled.addEventListener('click',function(){
-                                      var result=geoloqi.setPushDisabled(true);
-                                      alert(result);
-                                      });
-
-buttonGetUserName.addEventListener('click',function(){
-                                   var result=sessionProxy.getUserID();
-                                   alert(result);
-                                   });
-
-buttonIsAnonymus.addEventListener('click',function(){
-                                  //var result=sessionProxy.isAnonymous();
-                                  alert('Not available on iphone');
-                                  });
-
-buttonCreateAccountWithAnonymusUser.addEventListener('click',function(){
-                                                     sessionProxy.createAnonymousUserAccount({},{
-                                                                                                onSuccess:function(e)
-                                                                                                {
-                                                                                                    alert(e);
-                                                                                                },
-                                                                                                onFailure:function(e)
-                                                                                                {
-                                                                                                    alert(e);
-                                                                                                }
-                                                                                             });
-                                                         });
-
-buttonCreateAccountWithUserName.addEventListener('click',function(){
-                                                 sessionProxy.createAccountWithUsername('pritisrivastava','sapan.varshney@gmail.com',
-                                                                                        {
-                                                                                        onSuccess:function(e)
-                                                                                        {
-                                                                                        alert(e);
-                                                                                        },
-                                                                                        onFailure:function(e)
-                                                                                        {
-                                                                                        alert(e);
-                                                                                        }
-                                                                                        });
-                                                 });
-
-
-
-buttonAuthenticateUser.addEventListener('click',function(){
-                                        sessionProxy.authenticateUser('t.sharma@globallogic.com',
-                                                                      '12344321',
-                                                                      {
-                                                                      onSuccess:function(e)
-                                                                      {
-                                                                        alert(e);
-                                                                      },
-                                                                      onFailure:function(e)
-                                                                      {
-                                                                        alert(e);
-                                                                      }
-                                                                      }
-                                                                      );
-                                        });
-
-
-buttonregisterDeviceToken.addEventListener('click',function(){
-                                           sessionProxy.registerDeviceToken('1234');
-                                           });
-
-buttonRunGetrequest.addEventListener('click',function(){
-                                     var result=sessionProxy.runGetRequest("account/profile",
-                                                                           {
-                                                                           onSuccess:function(e)
-                                                                           {
-                                                                           alert(e);
-                                                                           },
-                                                                           onFailure:function(e)
-                                                                           {
-                                                                           alert(e);
-                                                                           }
-                                                                           });
-                                     });
-
-buttonrunPostRequestWithJSONObject.addEventListener('click',function(){
-                                                    var postJSON = {text:'This is test geonote'};
-                                                    sessionProxy.runPostRequestWithJSONObject("geonote/create",postJSON);
-                                                    });
-runPostRequestWithJSONArray.addEventListener('click',function(){
-                                             var jsonObjectArray=[{
-                                                                  "date": "2010-07-23T09:19:38-07:00",
-                                                                  "location": {
-                                                                  "position": {
-                                                                  "latitude": "45.445793867111",
-                                                                  "longitude": "-122.64261245728",
-                                                                  "speed": "10",
-                                                                  "altitude": "0",
-                                                                  "horizontal_accuracy": "24",
-                                                                  "vertical_accuracy": "0"
-                                                                  },
-                                                                  "type": "point"
-                                                                  },
-                                                                  "raw": {
-                                                                  "distance_filter": 5,
-                                                                  "tracking_limit": 2,
-                                                                  "rate_limit": 60,
-                                                                  "battery": 86
-                                                                  },
-                                                                  "client": {
-                                                                  "name": "Geoloqi",
-                                                                  "version": "0.1",
-                                                                  "platform": "iPhone OS 4",
-                                                                  "hardware": "iPhone2,1"
-                                                                  }
-                                                                  }];
-                                             sessionProxy.runPostRequestWithJSONArray("location/update",jsonObjectArray,
-                                                                                      {
-                                                                                      onSuccess:function(e)
-                                                                                      {
-                                                                                      alert(e);
-                                                                                      },
-                                                                                      onFailure:function(e)
-                                                                                      {
-                                                                                      alert(e);
-                                                                                      }
-                                                                                      });
-                                             });
-
-
-runAPI.addEventListener('click',function(){
-                        var myJSON = {};
-                        sessionProxy.runAPIRequest("user/create","POST",{},
+btnGet.addEventListener('click',function(){
+                        geoloqi.session.getRequest("location/history",{count:10,batch:true,accuracy:50,sort:'desc'},
                                                    {
                                                    onSuccess:function(e)
                                                    {
@@ -291,62 +204,318 @@ runAPI.addEventListener('click',function(){
                                                    },
                                                    onFailure:function(e)
                                                    {
-                                                   alert(e);
+                                                   alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
                                                    }
                                                    });
-
                         });
-buttonformatTimeStamp.addEventListener('click',function(){
-                                       //var result=sessionProxy.formatTimeStamp('1111111111');
-                                        alert('Not available on iphone');
-                                       });
 
- 
-var setError=Ti.UI.createButton({
-                                      title:'setErrorStatus',
-                                      top:830,
-                                      height:30,
-                                      width:200
-                                      });
+scrollViewer.add(btnGet);
 
-setError.addEventListener('click',function(){
-                                       
-                          //geoloqi.getLQTracker().setErrorStatus({code:101,userInfo:"ABC"});
-                          alert(geoloqi.getLQTracker().getErrorStatus());
-                                       });
+var btnGetProfile=Ti.UI.createButton({
+                                     title:'GET PROFILE',
+                                     top:255,
+                                     height:30,
+                                     width:200
+                                     });
 
-var canswitch=Ti.UI.createButton({
-                                title:'configureAnonymousUserAccountWithUserInfoAndProfile',
-                                top:880,
+btnGetProfile.addEventListener('click',function(){
+                               alert(geoloqi.tracker.getProfile());
+                               });
+
+scrollViewer.add(btnGetProfile);
+
+
+var btnSetProfile=Ti.UI.createButton({
+                                     title:'SET PROFILE(PASSIVE)',
+                                     top:290,
+                                     height:30,
+                                     width:200
+                                     });
+
+btnSetProfile.addEventListener('click',function(){
+                               alert(geoloqi.tracker.setProfile("PASSIVE"));
+                               });
+
+scrollViewer.add(btnSetProfile);
+
+
+
+
+var button1=Ti.UI.createButton({
+                               title:'tracker obj',
+                               top:350,
+                               height:30,
+                               width:200
+                               });
+
+button1.addEventListener('click',function(){
+                         alert(geoloqi.tracker);
+                         });
+
+scrollViewer.add(button1);
+
+var button2=Ti.UI.createButton({
+                               title:'iOS obj',
+                               top:400,
+                               height:30,
+                               width:200
+                               });
+
+button2.addEventListener('click',function(){
+                         alert(geoloqi.iOS);
+                         });
+
+scrollViewer.add(button2);
+
+var button3=Ti.UI.createButton({
+                               title:'dateOfLastSyncedLocationUpdate',
+                               top:450,
+                               height:30,
+                               width:200
+                               });
+
+button3.addEventListener('click',function(){
+                         alert(geoloqi.tracker.dateOfLastSyncedLocationUpdate);
+                         });
+
+
+scrollViewer.add(button3);
+
+var button4=Ti.UI.createButton({
+                               title:'getDateOfLastSyncedLocationUpdate()',
+                               top:500,
+                               height:30,
+                               width:200
+                               });
+
+button4.addEventListener('click',function(){
+                         alert(geoloqi.tracker.getDateOfLastSyncedLocationUpdate());
+                         });
+
+scrollViewer.add(button4);
+
+var button5=Ti.UI.createButton({
+                               title:'dateOfLastLocationUpdate',
+                               top:550,
+                               height:30,
+                               width:200
+                               });
+
+button5.addEventListener('click',function(){
+                         alert(geoloqi.tracker.dateOfLastLocationUpdate);
+                         });
+
+scrollViewer.add(button5);
+
+var button6=Ti.UI.createButton({
+                               title:'getDateOfLastLocationUpdate()()',
+                               top:600,
+                               height:30,
+                               width:200
+                               });
+
+button6.addEventListener('click',function(){
+                         alert(geoloqi.tracker.getDateOfLastLocationUpdate());
+                         });
+
+scrollViewer.add(button6);
+
+var button7=Ti.UI.createButton({
+                               title:'status',
+                               top:650,
+                               height:30,
+                               width:200
+                               });
+
+button7.addEventListener('click',function(){   
+                         alert(geoloqi.tracker.status);
+                         
+                         });
+
+scrollViewer.add(button7);
+
+var button8=Ti.UI.createButton({
+                               title:'getStatus()',
+                               top:700,
+                               height:30,
+                               width:200
+                               });
+
+button8.addEventListener('click',function(){
+                         alert(geoloqi.tracker.getStatus());
+                         });
+
+scrollViewer.add(button8);
+
+var button9=Ti.UI.createButton({
+                               title:'profile',
+                               top:750,
+                               height:30,
+                               width:200
+                               });
+
+button9.addEventListener('click',function(){
+                         alert(geoloqi.tracker.profile);
+                         });
+
+scrollViewer.add(button9);
+
+var button10=Ti.UI.createButton({
+                                title:'getProfile()',
+                                top:800,
                                 height:30,
                                 width:200
                                 });
 
-canswitch.addEventListener('click',function(){
-                           var abc = geoloqi.getLQTracker();
-                           abc.configureAnonymousUserAccountWithUserInfoAndProfile({name:"ashish"},"OFF");
+button10.addEventListener('click',function(){
+                          alert(geoloqi.tracker.getProfile());
                           });
 
+scrollViewer.add(button10);
 
+var button11=Ti.UI.createButton({
+                                title:'canSwitchToProfile()',
+                                top:850,
+                                height:30,
+                                width:200
+                                });
 
-window.add(scrollViewer);
-scrollViewer.add(getAccessToken);
-scrollViewer.add(buttonIsPushEnabled);
-scrollViewer.add(buttonSetPushEnabled);
-scrollViewer.add(buttonGetUserName);
-scrollViewer.add(buttonIsAnonymus);
-scrollViewer.add(buttonCreateAccountWithAnonymusUser);
-scrollViewer.add(buttonCreateAccountWithUserName);
-scrollViewer.add(buttonAuthenticateUser);
-scrollViewer.add(buttonregisterDeviceToken);
-scrollViewer.add(buttonRunGetrequest);
-scrollViewer.add(buttonrunPostRequestWithJSONObject);
-scrollViewer.add(runPostRequestWithJSONArray);
-scrollViewer.add(runAPI);
-scrollViewer.add(buttonformatTimeStamp);
-scrollViewer.add(setError);
-scrollViewer.add(canswitch);
+button11.addEventListener('click',function(){
+                          alert(geoloqi.tracker.canSwitchToProfile("PASSIVE"));
+                          });
 
+scrollViewer.add(button11);
 
-window.open();
+var button12=Ti.UI.createButton({
+                                title:'setProfile(REALTIME)',
+                                top:900,
+                                height:30,
+                                width:200
+                                });
 
+button12.addEventListener('click',function(){
+                          geoloqi.tracker.setProfile("REALTIME");
+                          });
+
+scrollViewer.add(button12);
+
+var button13=Ti.UI.createButton({
+                                title:'Object creation attempt',
+                                top:950,
+                                height:30,
+                                width:200
+                                });
+
+button13.addEventListener('click',function(){
+                          var abc = geoloqi.createLQTracker();
+                          alert("createLQTracker::"+ abc);
+                          var abc1 = geoloqi.createLQSession();
+                          alert("createLQSession::" + abc1);
+                          var abc2 = geoloqi.createiOS();
+                          alert("createiOS::" + abc2);
+                          alert("IF you get all three alert as undefined then its correct behavior");
+                          });
+
+scrollViewer.add(button13);
+
+var button14=Ti.UI.createButton({
+                                title:'Register for PUSH NOTIFICATION',
+                                top:1000,
+                                height:30,
+                                width:200
+                                });
+
+var label = Ti.UI.createLabel({
+                              text:'Attempting to register with Apple for Push Notifications...',
+                              textAlign:'center',
+                              width:'auto',
+                              top:1050
+                              });
+
+scrollViewer.add(label);
+
+button14.addEventListener('click',function(){ 
+                          // register for push notifications
+                          Titanium.Network.registerForPushNotifications({
+                                                                        types: [
+                                                                                Titanium.Network.NOTIFICATION_TYPE_BADGE,
+                                                                                Titanium.Network.NOTIFICATION_TYPE_ALERT,
+                                                                                Titanium.Network.NOTIFICATION_TYPE_SOUND,
+                                                                                Titanium.Network.NOTIFICATION_TYPE_NEWSSTAND
+                                                                                ],
+                                                                        success:function(e)
+                                                                        {
+                                                                        var deviceToken = e.deviceToken;
+                                                                        
+                                                                        geoloqi.iOS.registerDeviceToken(deviceToken);
+                                                                        
+                                                                        
+                                                                        label.text = "Device registered. Device token: \n\n"+deviceToken;
+                                                                        Ti.API.info("Push notification device token is: "+deviceToken);
+                                                                        Ti.API.info("Push notification types: "+Titanium.Network.remoteNotificationTypes);
+                                                                        Ti.API.info("Push notification enabled: "+Titanium.Network.remoteNotificationsEnabled);
+                                                                        },
+                                                                        error:function(e)
+                                                                        {
+                                                                        label.text = "Error during registration: "+e.error;
+                                                                        },
+                                                                        callback:function(e)
+                                                                        {
+                                                                        // called when a push notification is received.
+                                                                        alert("Received a push notification\n\nPayload:\n\n"+JSON.stringify(e.data));
+                                                                        
+                                                                        geoloqi.iOS.handlePush(e.data);
+                                                                        }
+                                                                        });	
+                          
+                          
+                          });
+
+scrollViewer.add(button14);
+
+//For Future methods will not work in ios
+
+//GetUserName
+var btnGetUserName=Ti.UI.createButton({
+                                title:'Get UserName',
+                                top:1200,
+                                height:30,
+                                width:200
+                                });
+
+btnGetUserName.addEventListener('click',function(){
+                          var userName = geoloqi.session.getUsername();
+                          alert("UserName:"+ userName);
+                          });
+
+scrollViewer.add(btnGetUserName);
+
+//IS Anonoymus
+var btnIsAnonymous=Ti.UI.createButton({
+                                      title:'Is Anonymous',
+                                      top:1250,
+                                      height:30,
+                                      width:200
+                                      });
+
+btnIsAnonymous.addEventListener('click',function(){
+                                var isAnonymous = geoloqi.session.isAnonymous();
+                                alert("isAnonymous:"+ isAnonymous);
+                                });
+
+scrollViewer.add(btnIsAnonymous);
+
+//isLowBatteryTrackingEnabled
+var btnIsLowBatteryTrackingEnabled=Ti.UI.createButton({
+                                      title:'isLowBatteryTrackingEnabled',
+                                      top:1300,
+                                      height:30,
+                                      width:200
+                                      });
+
+btnIsLowBatteryTrackingEnabled.addEventListener('click',function(){
+                                var isLowBatteryTrackingEnabled = geoloqi.isLowBatteryTrackingEnabled();
+                                alert("isLowBatteryTrackingEnabled:"+ isLowBatteryTrackingEnabled);
+                                });
+
+scrollViewer.add(btnIsLowBatteryTrackingEnabled);

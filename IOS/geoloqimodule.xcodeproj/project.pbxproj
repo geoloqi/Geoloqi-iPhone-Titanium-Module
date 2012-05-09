@@ -24,6 +24,8 @@
 /* Begin PBXBuildFile section */
 		145067B81538439C0086E351 /* TiGeoloqiLQTrackerProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 145067B61538439C0086E351 /* TiGeoloqiLQTrackerProxy.h */; };
 		145067B91538439C0086E351 /* TiGeoloqiLQTrackerProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 145067B71538439C0086E351 /* TiGeoloqiLQTrackerProxy.m */; };
+		14F6B6CB1557CA22008F3774 /* TiGeoloqiiOSProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 14F6B6C91557CA22008F3774 /* TiGeoloqiiOSProxy.h */; };
+		14F6B6CC1557CA22008F3774 /* TiGeoloqiiOSProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 14F6B6CA1557CA22008F3774 /* TiGeoloqiiOSProxy.m */; };
 		1A75CFB71536B5AF00CB3BCF /* JSONKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A75CFB41536B5AF00CB3BCF /* JSONKit.h */; };
 		1A75CFB81536B5AF00CB3BCF /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A75CFB51536B5AF00CB3BCF /* JSONKit.m */; };
 		1A8379AD1536A80F00FFD961 /* TiGeoloqiLQSessionProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A8379AB1536A80F00FFD961 /* TiGeoloqiLQSessionProxy.h */; };
@@ -60,6 +62,8 @@
 /* Begin PBXFileReference section */
 		145067B61538439C0086E351 /* TiGeoloqiLQTrackerProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiGeoloqiLQTrackerProxy.h; sourceTree = "<group>"; };
 		145067B71538439C0086E351 /* TiGeoloqiLQTrackerProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TiGeoloqiLQTrackerProxy.m; sourceTree = "<group>"; };
+		14F6B6C91557CA22008F3774 /* TiGeoloqiiOSProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiGeoloqiiOSProxy.h; sourceTree = "<group>"; };
+		14F6B6CA1557CA22008F3774 /* TiGeoloqiiOSProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TiGeoloqiiOSProxy.m; sourceTree = "<group>"; };
 		1A75CFB41536B5AF00CB3BCF /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		1A75CFB51536B5AF00CB3BCF /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 		1A8379AB1536A80F00FFD961 /* TiGeoloqiLQSessionProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TiGeoloqiLQSessionProxy.h; sourceTree = "<group>"; };
@@ -138,6 +142,8 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				14F6B6C91557CA22008F3774 /* TiGeoloqiiOSProxy.h */,
+				14F6B6CA1557CA22008F3774 /* TiGeoloqiiOSProxy.m */,
 				1ADEBE0C153C166C00EDFFA8 /* TiGeoloqiModule.h */,
 				1ADEBE0D153C166C00EDFFA8 /* TiGeoloqiModule.m */,
 				1A8379AF1536A86200FFD961 /* Utility */,
@@ -198,6 +204,7 @@
 				1A75CFB71536B5AF00CB3BCF /* JSONKit.h in Headers */,
 				145067B81538439C0086E351 /* TiGeoloqiLQTrackerProxy.h in Headers */,
 				1ADEBE0E153C166C00EDFFA8 /* TiGeoloqiModule.h in Headers */,
+				14F6B6CB1557CA22008F3774 /* TiGeoloqiiOSProxy.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -226,6 +233,9 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "geoloqimodule" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -276,6 +286,7 @@
 				1A75CFB81536B5AF00CB3BCF /* JSONKit.m in Sources */,
 				145067B91538439C0086E351 /* TiGeoloqiLQTrackerProxy.m in Sources */,
 				1ADEBE0F153C166C00EDFFA8 /* TiGeoloqiModule.m in Sources */,
+				14F6B6CC1557CA22008F3774 /* TiGeoloqiiOSProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

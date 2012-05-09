@@ -1,10 +1,12 @@
-//
-//  Constants.h
-//  geoloqimodule
-//
-//  Created by globallogic on 06/04/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+/**
+ *   Constants.h
+ *  Titanium GeoLoqi IOS-Module
+ *
+ *  Created by Global-Logic GeoLoqi IOS Module Team on 09/05/2012.
+ *  Copyright 2012 Global Logic. All rights reserved.
+ *  Licensed under the terms of the Apache Public License
+ *  Please see the LICENSE included with this distribution for details.
+ */
 
 
 #pragma mark-
@@ -18,10 +20,13 @@
 #pragma pragma mark-
 #pragma mark Inline Properties
 
-#define CONST_GEOLOQI_SERVICE_API_KEY          @"apiKey"
-#define CONST_GEOLOQI_SERVICE_API_SECRET       @"apiSecret"
-#define CONST_GEOLOQI_SERVICE_USERNAME         @"userName"
-#define CONST_GEOLOQI_SERVICE_PASSWORD         @"password"
+#define CONST_GEOLOQI_SERVICE_API_KEY           @"clientId"
+#define CONST_GEOLOQI_SERVICE_API_SECRET        @"clientSecret"
+#define CONST_GEOLOQI_SERVICE_USERNAME          @"username"
+#define CONST_GEOLOQI_SERVICE_PASSWORD          @"password"
+#define CONST_GEOLOQI_SERVICE_TRACKING_PROFILE  @"trackingProfile"
+#define CONST_GEOLOQI_SERVICE_ALLOW_ANONYMOUS   @"allowAnonymousUsers"
+
 
 #pragma mark-
 #pragma mark Service Methods
@@ -42,9 +47,10 @@
 #pragma mark-
 #pragma mark Custom error message
 
-#define CONST_GEOLOQI_VALIDATION_INVALID_ARGS               @"Please provide valid arguments!"
-#define CONST_GEOLOQI_VALIDATION_NO_SESSION                 @"Session is NULL!"
-#define CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET     @"Invalid api key or secret passed."
+
+#define CONST_GEOLOQI_VALIDATION_INVALID_ARGS               @"Invalid arguments passed!"
+#define CONST_GEOLOQI_VALIDATION_NO_SESSION                 @"Valid session is not available!"
+#define CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET     @"Invalid clientId or clientSecret passed. in init"
 #define CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS     @"Invalid event listners passed."
 
 
@@ -55,10 +61,8 @@
 #define CONST_GEOLOQI_VALIDATION_NO_SESSION_CODE                 302
 #define CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET_CODE     303
 #define CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS_CODE     304
+#define CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL             305
 
-
-#pragma mark-
-#pragma mark LQTracker Constants
 
 #pragma mark LQTracker Profile Enum Constants
 

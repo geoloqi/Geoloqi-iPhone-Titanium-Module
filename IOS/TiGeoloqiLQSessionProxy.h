@@ -1,9 +1,13 @@
 /**
- * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2012 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Apache Public License
- * Please see the LICENSE included with this distribution for details.
+ *   TiGeoloqiLQSessionProxy.h
+ *  Titanium GeoLoqi IOS-Module
+ *
+ *  Created by Global-Logic GeoLoqi IOS Module Team on 09/05/2012.
+ *  Copyright 2012 Global Logic. All rights reserved.
+ *  Licensed under the terms of the Apache Public License
+ *  Please see the LICENSE included with this distribution for details.
  */
+
 #import "TiProxy.h"
 #import "TiUtils.h"
 #import "RequestHelper.h"
@@ -13,50 +17,48 @@
 
 }
 
-//Properties
+/**
+ * Request helper property
+ */
 @property (nonatomic,retain)     RequestHelper *objRequestHelper;
 
 //Methods
--(void) authenticateUser:(id) args;
--(void) createAnonymousUserAccount:(id) args;
--(void) createAccountWithUsername:(id) args;
+//-(NSString *) getAccessToken:(id) args;
+//-(NSString *) accessToken;
 
--(void) runAPIRequest:(id) args;
--(void) runGetRequest:(id) args;
+/**
+ * Returns the user id of authentic user
+ */
+-(NSString *) getUserId:(id) args;
 
--(void) runPostRequestWithJSONObject:(id) args;
--(void) runPostRequestWithJSONArray:(id) args;
+//Async call to geoloqi server
+/**
+ * Make the request to geoloqi server
+ */
+-(void) apiRequest:(id) args;
 
--(NSString *) getAccessToken:(id) args;
--(NSString *) accessToken;
+/**
+ * Make the GET request to geoloqi serverr
+ */
+-(void) getRequest:(id) args;
 
--(void) setSavedSession:(id) args;
--(id) savedSession:(id) args;
+/**
+ * Make the POST request to geoloqi server
+ */
+-(void) postRequest:(id) args;
 
--(id) sessionWithAccessToken:(id) args;
+//Future methods, not implemented yet on geoloqi sdk
+/**
+ * Returns the user name of authentic user
+ */
+-(NSString *) getUsername:(id) args;
 
-//-(BOOL) isPushEnabled:(id) args;
-//-(void) setPushEnabled:(id) args;
+/**
+ * Is current session is anonymous
+ */
+-(BOOL) isAnonymous:(id) args;
 
--(void)applicationDidFinishLaunchWithOptions:(id)args;
--(void)registerDeviceToken:(id) args;
--(void)handleDidFailToRegisterForRemoteNotifications:(id) args;
--(void)handlePush:(id) userInfo;
 
--(TiBlob *)deviceIdentifier;
--(TiBlob *)getDeviceIdentifier:(id)args;
 
--(void)setDeviceIdentifier:(TiBlob*)args;
-
--(NSString *)deviceIdentifierHexString;
--(NSString *)getDeviceIdentifierHexString:(id)args;
-
--(void)registerForPushNotificationsWithCallback:(id)args;
-
--(BOOL)pushAlertsEnabled:(id)args;
--(BOOL)pushSoundsEnabled:(id)args;
--(BOOL)pushBadgesEnabled:(id)args;
-
--(NSString *) getUserID:(id) args;
 
 @end

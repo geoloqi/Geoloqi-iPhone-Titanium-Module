@@ -1,9 +1,14 @@
 /**
- * Your Copyright Here
+ *  TiGeoloqiModule.m
+ *  Titanium GeoLoqi IOS-Module
  *
- * Appcelerator Titanium is Copyright (c) 2009-2010 by Appcelerator, Inc.
- * and licensed under the Apache Public License (version 2)
+ *  Created by Global-Logic GeoLoqi IOS Module Team on 09/05/2012.
+ *  Copyright 2012 Global Logic. All rights reserved.
+ *  Licensed under the terms of the Apache Public License
+ *  Please see the LICENSE included with this distribution for details.
  */
+
+
 #import "TiGeoloqiModule.h"
 #import "TiBase.h"
 #import "TiHost.h"
@@ -11,10 +16,14 @@
 #import "TiGeoloqiLQSessionProxy.h"
 #import <TiApp.h>
 
+
+
+
 static  TiGeoloqiModule *currentObject  =   nil;
 
-
 @implementation TiGeoloqiModule
+
+@synthesize objRequestHelper;
 
 #pragma mark Internal
 
@@ -34,9 +43,19 @@ static  TiGeoloqiModule *currentObject  =   nil;
 
 -(void)startup
 {
-    currentObject   =   self;
-    [LQSession application:(UIApplication*)[TiApp app] didFinishLaunchingWithOptions:[[TiApp app] launchOptions]];
+    bLogEnabled =   NO;
     
+    if (self.objRequestHelper==nil)
+    {
+        RequestHelper *objReqHelper     =   [[RequestHelper alloc] initWithDelegate:self];
+        self.objRequestHelper           =    objReqHelper;    
+    
+        [objReqHelper release];
+        objReqHelper    = nil;
+    }
+        
+    
+    currentObject   =   self;
 	// this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
@@ -58,7 +77,9 @@ static  TiGeoloqiModule *currentObject  =   nil;
 
 -(void)dealloc
 {
-    RELEASE_TO_NIL(LQTrackerProxyObj);
+    RELEASE_TO_NIL(self.objRequestHelper);
+    RELEASE_TO_NIL(objLQTracker);
+    RELEASE_TO_NIL(objiOSProxy);
 	// release any resources that have been retained by the module
 	[super dealloc];
 }
@@ -104,68 +125,12 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(id)createProxy:(NSArray*)args forName:(NSString*)name context:(id<TiEvaluator>)evaluator
 {
-    
-    if ([name isEqualToString:@"createLQSession"])
-    {
-        if (args && evaluator)
-        {
-            return [[[TiGeoloqiLQSessionProxy alloc] _initWithPageContext:evaluator args:args] autorelease];
-        }
-        else if (evaluator)
-        {
-            return [[[TiGeoloqiLQSessionProxy alloc] _initWithPageContext:evaluator] autorelease];            
-        }
-        else
-        {
-            return [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
-        }
-    }
-    else
-    {
-        NSLog(@"[ERROR]: Proxy Creation for %@ is not supported",name);
-    }
+    return nil;
 }
 
-//==========================================================================================
-//  Method Name: getLQTracker
-//  Return Type: id
-//  Parameter  : N.A.
+#pragma mark-
+#pragma mark  Internal method's not to be exposed
 
-//  description: LQTracker class getter Method.
-
-//  created by : Globallogic
-//==========================================================================================
--(id)getLQTracker:(id) args
-{
-
-    
-    if (LQTrackerProxyObj == nil) {
-        
-        LQTrackerProxyObj = [[TiGeoloqiLQTrackerProxy alloc]init];
-    }
-    return LQTrackerProxyObj;
-}
-
-//==========================================================================================
-//  Method Name: LQTracker
-//  Return Type: id
-//  Parameter  : N.A.
-
-//  description: LQTracker class getter Method, exposed as property.
-
-//  created by : Globallogic
-//==========================================================================================
--(id)LQTracker
-{
-    if (LQTrackerProxyObj == nil) {
-        
-        LQTrackerProxyObj = [[TiGeoloqiLQTrackerProxy alloc]init];
-    }
-    return LQTrackerProxyObj;
-}
-
-
-#pragma Public APIs
 //==========================================================================================
 //  Method Name: setDebug
 //  Return Type: void
@@ -207,35 +172,6 @@ static  TiGeoloqiModule *currentObject  =   nil;
 }
 
 //==========================================================================================
-//  Method Name: pushDisabled
-//  Return Type: BOOL
-//  Parameter  : N.A.
-
-//  description: Check if APN is disables
-//
-//  created by : Globallogic
-//==========================================================================================
--(BOOL) pushDisabled:(id) value
-{
-    BOOL bPushDisabled   =      [LQSession pushDisabled];
-    return bPushDisabled;    
-}
-
-//==========================================================================================
-//  Method Name: setPushDisabled
-//  Return Type: void
-//  Parameter  : BOOL: bPushEnable
-
-//  description: Set the APN disables
-//
-//  created by : Globallogic
-//==========================================================================================
--(void) setPushDisabled:(BOOL) bPushDisabled
-{
-    [LQSession setPushDisabled:bPushDisabled];
-}
-
-//==========================================================================================
 //  Method Name: validationErrorOccuredWithError
 //  Return Type: void
 //  Parameter  : NSError: err
@@ -251,6 +187,476 @@ static  TiGeoloqiModule *currentObject  =   nil;
              withObject:[Utils getDictionaryFromErrorObject:err]];
     }
 }
+
+#pragma mark-
+#pragma mark  Exposed method to titanium developers
+//===================================================================================================================
+//  Method Name: init
+//  Return Type: Void
+//  Parameter  : id: args; where in args user will pass the api key,secret,tracking profile & other parameter
+//  description: Initlize the geoloqi with a sessoin & start tracking profile.      
+//
+//  created by : Globallogic
+//===================================================================================================================
+-(void) init:(id) args
+{
+    //Check if previous session is available if ys then restore it else create anonymous sesssion
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    if ([args count]!=2)
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_ARGS_CODE 
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_ARGS 
+                                                       method:[NSString stringWithFormat:@"%s",_cmd]];
+        [self requestCompleteWithValidationError:objError];
+        
+        return;
+    }
+    
+    //GET THE CALLBACK EVENT LISTNERS
+    NSMutableDictionary *dictEventListners  =   (NSMutableDictionary *)[args objectAtIndex:1];
+    
+    id success = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS];
+    id error = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE];
+    
+    //IF EVENT LISTNERS ARE NOT VALID/PROVIDED THEN THROW VALIDATION ERROR
+    if (success==nil || error==nil)
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS_CODE 
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS 
+                                                       method:[NSString stringWithFormat:@"%s",_cmd]];
+        [self requestCompleteWithValidationError:objError];
+        
+        return;
+    }
+    
+    
+    NSMutableDictionary *dictConfig =   (NSMutableDictionary *)[args objectAtIndex:0];
+    
+    NSString *strAPIKey          =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_KEY];
+    NSString *strAPISecret       =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_SECRET];  
+    NSString *strTrackerProfile  =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_TRACKING_PROFILE];
+    
+    NSLog(@"apiKey: %d \n apiSecret: %d \n Tracking: %@",strAPIKey,strAPISecret,strTrackerProfile);
+    
+    //CHECK IF API SECRET & KEY IS NOT PASSED BY DEVELOPER THEN THROW ERROR THAT MANDATORY 
+    //PARAMETERS ARE NOT AVAILABLE
+    if (([strAPIKey isEqualToString:CONST_EMPTY_STRING]) || ([strAPISecret isEqualToString:CONST_EMPTY_STRING]))
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET_CODE
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET 
+                                                       method:CONST_EMPTY_STRING];
+        
+        [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE withObject:[Utils getDictionaryFromErrorObject:objError] listener:error thisObject:nil];        
+        return;
+    }
+    
+    
+    [self.objRequestHelper setAPIKey:strAPIKey secret:strAPISecret];
+    
+    if ([LQSession savedSession]!=nil) 
+    {
+        NSLog(@"Restoring Session");
+        [self.objRequestHelper setObjSession:[LQSession savedSession]];
+        [[LQTracker sharedTracker] setSession:[LQSession savedSession]];    
+        
+        [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:nil listener:success
+                        thisObject:nil];
+    }
+    else
+    {
+        
+        [[LQTracker sharedTracker] setProfile:[Utils getTrakerProfileFromString:strTrackerProfile]];
+        
+        //CHECK IF USER HAS SET "allowAnonymousUsers" externally
+        BOOL bAllowAnonymousUsers   =   [TiUtils boolValue:[dictConfig valueForKey:CONST_GEOLOQI_SERVICE_ALLOW_ANONYMOUS] def:YES];
+        
+        if (bAllowAnonymousUsers)
+        {
+            NSLog(@"Creating anonymous");
+            //Set the profile given in init config
+            //If no previous session available then call the create anon session 
+            [self.objRequestHelper createAnonymousAccountWithInfo:nil 
+                                              successEventListner:success 
+                                                errorEventListner:error];
+        }
+        else
+        {
+            NSLog(@"Not creating anonymous");
+            [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:nil listener:success
+                            thisObject:nil];
+        }
+        
+    }
+}
+
+
+//==========================================================================================
+//  Method Name: authenticateUser
+//  Return Type: void
+//  Parameter  : id: args 
+//  description: Authenticate the given username password & if authenticated 
+//               then save the session       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) authenticateUser:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    
+    
+    if ([args count]!=3)
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_ARGS_CODE 
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_ARGS 
+                                                       method:[NSString stringWithFormat:@"%s",_cmd]];
+        [self requestCompleteWithValidationError:objError];
+    }
+    else
+    {
+        NSString *strUserName   =   [TiUtils stringValue:[args objectAtIndex:0]];
+        NSString *strPassword   =   [TiUtils stringValue:[args objectAtIndex:1]];
+        
+        NSMutableDictionary *dictEventListners  =   (NSMutableDictionary *)[args objectAtIndex:2];
+        
+        id success = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS];
+        id error = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE];
+        
+        //IF EVENT LISTNERS ARE NOT VALID/PROVIDED THEN THROW VALIDATION ERROR
+        if (success==nil || error==nil)
+        {
+            NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS_CODE 
+                                                      description:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS 
+                                                           method:[NSString stringWithFormat:@"%s",_cmd]];
+            [self requestCompleteWithValidationError:objError];
+            
+            return;
+        }
+        
+        [self.objRequestHelper configureSessionForUserName:strUserName
+                                                  password:strPassword 
+                                       successEventListner:success
+                                         errorEventListner:error];
+    }
+}
+
+//==========================================================================================
+//  Method Name: createAnonymousUser
+//  Return Type: void
+//  Parameter  : id: args 
+//  description: Create the anonoumous account with information provided by user       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) createAnonymousUser:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    if ([args count]!=2)
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_ARGS_CODE 
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_ARGS 
+                                                       method:[NSString stringWithFormat:@"%s",_cmd]];
+        
+        [self requestCompleteWithValidationError:objError];
+    }
+    else
+    {
+        NSDictionary *extraInfo   =  [args objectAtIndex:0];
+        
+        NSMutableDictionary *dictEventListners  =   (NSMutableDictionary *)[args objectAtIndex:1];
+        
+        id success = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS];
+        id error = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE];
+        
+        //IF EVENT LISTNERS ARE NOT VALID/PROVIDED THEN THROW VALIDATION ERROR
+        if (success==nil || error==nil)
+        {
+            NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS_CODE 
+                                                      description:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS 
+                                                           method:[NSString stringWithFormat:@"%s",_cmd]];
+            [self requestCompleteWithValidationError:objError];
+            
+            return;
+        }
+        
+        
+        [self.objRequestHelper createAnonymousAccountWithInfo:extraInfo 
+                                          successEventListner:success 
+                                            errorEventListner:error];
+    }    
+}
+
+//==========================================================================================
+//  Method Name: createUser: password: extraInfo
+//  Return Type: void
+//  Parameter  : id: args
+
+//  description: create the new accont on the go
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) createUser:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    
+    if ([args count]!=2)
+    {
+        NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_ARGS_CODE 
+                                                  description:CONST_GEOLOQI_VALIDATION_INVALID_ARGS 
+                                                       method:[NSString stringWithFormat:@"%s",_cmd]];
+        [self requestCompleteWithValidationError:objError];
+   
+    }
+    else
+    {
+        NSMutableDictionary *dictUserInfo   =   (NSMutableDictionary *)[args objectAtIndex:0];
+        
+        NSString     *strUserName       =   [Utils getStringValueForDict:dictUserInfo fromKey:CONST_GEOLOQI_SERVICE_USERNAME];
+        
+        NSString     *strPassword       =   [Utils getStringValueForDict:dictUserInfo fromKey:CONST_GEOLOQI_SERVICE_PASSWORD];
+
+        
+        //IF USERNAME / PWD IS PASSED AS BLANK OR NOT PASSED AT ALL
+        if ([strUserName isEqualToString:CONST_EMPTY_STRING] || [strPassword isEqualToString:CONST_EMPTY_STRING])
+        {
+            NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_ARGS_CODE 
+                                                      description:CONST_GEOLOQI_VALIDATION_INVALID_ARGS 
+                                                           method:[NSString stringWithFormat:@"%s",_cmd]];
+            [self requestCompleteWithValidationError:objError];
+            
+            return;
+        }
+        
+        NSMutableDictionary *dictEventListners  =   (NSMutableDictionary *)[args objectAtIndex:1];
+        
+        id success  = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS];
+        id error    = [dictEventListners objectForKey:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE];
+        
+        //IF EVENT LISTNERS ARE NOT VALID/PROVIDED THEN THROW VALIDATION ERROR
+        if (success==nil || error==nil)
+        {
+            NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS_CODE 
+                                                      description:CONST_GEOLOQI_VALIDATION_INVALID_EVENT_LISTNERS 
+                                                           method:[NSString stringWithFormat:@"%s",_cmd]];
+            [self requestCompleteWithValidationError:objError];
+            
+            return;
+        }
+        
+        
+        [self.objRequestHelper createAccountForUserName:strUserName
+                                               password:strPassword 
+                                              extraInfo:nil 
+                                    successEventListner:success 
+                                      errorEventListner:error];
+    }
+}
+
+#pragma pragma mark-
+#pragma mark Get proxy class refrences
+//==========================================================================================
+//  Method Name: session
+//  Return Type: TiGeoloqiLQSessionProxy 
+//  Parameter  : N.A. 
+//  description: Returns sessionProxy object to let user run the session specific methods/properties       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(id) session
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    if (objLQSession==nil)
+    {
+        objLQSession    =   [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
+    }   
+    
+    [objLQSession.objRequestHelper setObjSession:[LQSession savedSession]];
+    
+    return objLQSession;
+}
+
+//==========================================================================================
+//  Method Name: iOS
+//  Return Type: TiGeoloqiiOSProxy*
+//  Parameter  : N.A.
+//  description: This method will be available as a property to the titanium developer and can be accessed by dot notation.       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(TiGeoloqiiOSProxy*)iOS
+{
+    if (objiOSProxy == nil)
+    {
+        objiOSProxy = [[TiGeoloqiiOSProxy alloc] init];
+    }
+    return objiOSProxy;
+}
+
+//==========================================================================================
+//  Method Name: tracker
+//  Return Type: TiGeoloqiLQTrackerProxy*
+//  Parameter  : N.A.
+//  description: This method will be available as a property to the titanium developer and can be accessed by dot notation.       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(TiGeoloqiLQTrackerProxy*)tracker
+{
+    if (objLQTracker == nil)
+    {
+        objLQTracker = [[TiGeoloqiLQTrackerProxy alloc] init];
+    }
+    return objLQTracker;
+}
+
+#pragma pragma mark-
+#pragma mark Callback Events
+//==========================================================================================
+//  Method Name: requestCompleteWithSuccess
+//  Return Type: void
+//  Parameter  : NSDictionary: responseDictionary 
+//  description: Callback event, request is successfully completed from request helper class using geoloqi sdk, return the resonse object recieved from geoloqi server       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) requestCompleteWithSuccess:(NSDictionary *) responseDictionary  eventListner:(id) listner
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+
+    [self.objRequestHelper setObjSession:[LQSession savedSession]];
+    [[LQTracker sharedTracker] setSession:[LQSession savedSession]];        
+    
+        //else listner will always be passed 
+    [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:[Utils getResponseDictionary:responseDictionary] listener:listner
+                        thisObject:nil];
+    
+}
+
+//==========================================================================================
+//  Method Name: requestCompleteWithError
+//  Return Type: void
+//  Parameter  : NSError: error 
+//  description: Callback event, there is some error from geoloqi service, return the error object with error_key & error_description       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) requestCompleteWithError:(NSError *) error eventListner:(id) listner
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+        //else listner will always be passed 
+        [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE withObject:[Utils getDictionaryFromErrorObject:error] listener:listner
+                        thisObject:nil];
+}
+
+//==========================================================================================
+//  Method Name: requestCompleteWithValidationError
+//  Return Type: void
+//  Parameter  : NSError: error 
+//  description: Callback event, there is some validation error checked locally       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) requestCompleteWithValidationError:(NSError *) error
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    [self validationErrorOccuredWithError:error];
+}
+
+
+
+#pragma pragma mark-
+#pragma mark Future methods, not implemented yet on geoloqi sdk
+//==========================================================================================
+//  Method Name: isLowBatteryTrackingEnabled:
+//  Return Type: BOOL
+//  Parameter  : id : args, this will be ignored
+
+//  description: Gets the current value of the low battery tracking preference
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(BOOL) isLowBatteryTrackingEnabled:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    return [self.objRequestHelper isLowBatteryTrackingEnabled];  
+}
+
+//==========================================================================================
+//  Method Name: enableLowBatteryTracking:
+//  Return Type: void
+//  Parameter  : id : args, this will be ignored
+
+//  description: Should enable low battery tracking preference.
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(void) enableLowBatteryTracking:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    [self.objRequestHelper enableLowBatteryTracking];  
+}
+
+//==========================================================================================
+//  Method Name: disableLowBatteryTracking:
+//  Return Type: void
+//  Parameter  : id : args, this will be ignored
+
+//  description: Should disable low battery tracking preference.
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(void) disableLowBatteryTracking:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    [self.objRequestHelper disableLowBatteryTracking];  
+}
+
 
 
 @end

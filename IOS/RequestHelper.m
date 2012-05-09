@@ -1,19 +1,25 @@
-//
-//  RequestHelper.m
-//  geoloqimodule
-//
-//  Created by globallogic on 06/04/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+/**
+ *  RequestHelper.m
+ *  Titanium GeoLoqi IOS-Module
+ *
+ *  Created by Global-Logic GeoLoqi IOS Module Team on 09/05/2012.
+ *  Copyright 2012 Global Logic. All rights reserved.
+ *  Licensed under the terms of the Apache Public License
+ *  Please see the LICENSE included with this distribution for details.
+ */
 
 #import "RequestHelper.h"
 #import "TiGeoloqiModule.h"
 
 @implementation RequestHelper
 
+#pragma mark-
+#pragma mark Properties
 @synthesize m_delegate;
 @synthesize objSession;
 
+#pragma mark-
+#pragma mark Initlizer methods
 //==========================================================================================
 //  Method Name: initWithDelegate
 //  Return Type: id
@@ -31,7 +37,8 @@
 
     if(self = [super init])
     {
-        m_delegate  =   delegate;
+        [self setM_delegate:delegate];
+        [self setObjSession:[LQSession savedSession]];
     }
         
     return self;
@@ -57,6 +64,9 @@
      [LQSession setAPIKey:apiKey secret:apiSecret];   
 }
 
+
+#pragma mark-
+#pragma mark Async  call to Geoloqi
 //==========================================================================================
 //  Method Name: runGetRequestWithAPIName: successEventListner: errorEventListner:
 //  Return Type: void
@@ -69,7 +79,6 @@
 //
 //  created by : Globallogic
 //==========================================================================================
-
 -(void) runGetRequestWithAPIName:(NSString *) strAPIName
              successEventListner:(id) eventSuccess
                errorEventListner:(id) eventError
@@ -80,7 +89,7 @@
     }
     
     //IF NO SESSION IS AVAILABE THEN THROW VALIDATION ERROR
-    if (objSession==nil)
+    if (self.objSession==nil)
     {
          NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_NO_SESSION_CODE 
                                               description:CONST_GEOLOQI_VALIDATION_NO_SESSION
@@ -93,11 +102,11 @@
     
     strAPIName  =   [self appendSlashPrefixAtApiName:strAPIName];
 
-    NSLog(objSession.accessToken);
+    NSLog(self.objSession.accessToken);
     
-    NSURLRequest *req = [objSession requestWithMethod:CONST_GEOLOQI_SERVICE_REQUEST_GET path:strAPIName payload:nil];
+    NSURLRequest *req = [self.objSession requestWithMethod:CONST_GEOLOQI_SERVICE_REQUEST_GET path:strAPIName payload:nil];
     
-    [objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
+    [self.objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
 
         NSLog(@"Response: %@ error:%@", responseDictionary, error);
         
@@ -105,12 +114,10 @@
         {
             NSLog(@"makeRequest:[ERROR] %@",[error localizedDescription]);
             [m_delegate requestCompleteWithError:error eventListner:eventError];
-            // [self fireEvent:@"requestFailed" withObject:[self getDictionaryFromErrorObject:error]];
         }
         else
         {
             [m_delegate requestCompleteWithSuccess:responseDictionary eventListner:eventSuccess];
-            //[self fireEvent:@"requestCompleted" withObject:responseDictionary];
         }
 	}];
 }
@@ -124,7 +131,7 @@
 //               id      : eventSuccess
 //               id      : eventError   
 
-//  description: Make the get request to geoloqi server for given api name as strAPIName        
+//  description: Make the post request to geoloqi server for given api name as strAPIName        
 //
 //  created by : Globallogic
 //==========================================================================================
@@ -140,7 +147,7 @@
     }
     
     //IF NO SESSION IS AVAILABE THEN THROW VALIDATION ERROR
-    if (objSession==nil)
+    if (self.objSession==nil)
     {
         NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_NO_SESSION_CODE 
                                              description:CONST_GEOLOQI_VALIDATION_NO_SESSION
@@ -152,9 +159,9 @@
     
     strAPIName  =   [self appendSlashPrefixAtApiName:strAPIName];
     
-    NSURLRequest *req = [objSession requestWithMethod:CONST_GEOLOQI_SERVICE_REQUEST_POST path:strAPIName payload:objPayload];
+    NSURLRequest *req = [self.objSession requestWithMethod:CONST_GEOLOQI_SERVICE_REQUEST_POST path:strAPIName payload:objPayload];
     
-    [objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
+    [self.objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
         
         NSLog(@"Response: %@ error:%@", responseDictionary, error);
         
@@ -196,7 +203,7 @@
     }
     
     //IF NO SESSION IS AVAILABE THEN THROW VALIDATION ERROR
-    if (objSession==nil)
+    if (self.objSession==nil)
     {
         NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_NO_SESSION_CODE 
                                              description:CONST_GEOLOQI_VALIDATION_NO_SESSION
@@ -208,11 +215,9 @@
     
     strAPIName  =   [self appendSlashPrefixAtApiName:strAPIName];
     
-    NSURLRequest *req = [objSession requestWithMethod:strMethodName path:strAPIName payload:objPayload];
+    NSURLRequest *req = [self.objSession requestWithMethod:strMethodName path:strAPIName payload:objPayload];
     
-    [objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
-        
-        NSLog(@"Response: %@ error:%@", responseDictionary, error);
+    [self.objSession runAPIRequest:req completion:^(NSHTTPURLResponse *response, NSDictionary *responseDictionary, NSError *error) {
         
         if(error) 
         {
@@ -256,14 +261,12 @@
      {
          if(session.accessToken) 
          {
-             NSLog(@"[DEBUG]: SET SAVED SESSION %@",session.description);
-             
+             [LQSession setSavedSession:session];
              [self setObjSession:session];
              [m_delegate requestCompleteWithSuccess:nil eventListner:eventSuccess];
          } 
          else 
          {
-             NSLog(@"setSessionForGivenUserName:[ERROR] %@",[error localizedDescription]);
              [m_delegate requestCompleteWithError:error eventListner:eventError];
          }
      }];
@@ -294,14 +297,13 @@
       {
           if(session.accessToken) 
           {
-              NSLog(@"[DEBUG]: SET SAVED SESSION");
+             [LQSession setSavedSession:session];
              [self setObjSession:session];
-              //[LQSession setSavedSession:session];
-              [m_delegate requestCompleteWithSuccess:nil eventListner:eventSuccess];
+             [m_delegate requestCompleteWithSuccess:nil eventListner:eventSuccess];
           }
           else
           {
-              NSLog(@"createAnonymousAccountWithInfo:[ERROR] %@",[error localizedDescription]);
+              NSLog(@"createAnonymousAccountWithInfo %@",[error localizedDescription]);
               [m_delegate requestCompleteWithError:error eventListner:eventError];
           }
       }];
@@ -337,6 +339,7 @@
          
          if(session.accessToken) 
          {
+             [LQSession setSavedSession:session];             
              [self setObjSession:session];
              [m_delegate requestCompleteWithSuccess:nil eventListner:eventSuccess];
          } 
@@ -347,48 +350,8 @@
      }];
 }
 
-
-////==========================================================================================
-////  Method Name: isPushEnabled
-////  Return Type: BOOL
-////  Parameter  : N.A.
-//
-////  description: Check if APN is Enabled
-////
-////  created by : Globallogic
-////==========================================================================================
-//-(BOOL) isPushEnabled
-//{
-//    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-//    {
-//        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-//    }
-//
-//    //INVERT THE VALUE AS IOS PROVIDE THE FUNCTION pushDisabled RATHER THEN isPushEnabled
-//    BOOL bPushEnabled   =      !([LQSession pushDisabled]);
-//    return bPushEnabled;    
-//}
-//
-////==========================================================================================
-////  Method Name: setPushEnabled
-////  Return Type: void
-////  Parameter  : BOOL: bPushEnable
-//
-////  description: Set the APN Enable
-////
-////  created by : Globallogic
-////==========================================================================================
-//-(void) setPushEnabled:(BOOL) bPushEnable
-//{
-//    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-//    {
-//        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-//    }
-//
-//    [LQSession setPushDisabled:!(bPushEnable)];
-//}
-
-
+#pragma mark-
+#pragma mark LQSession methods
 //==========================================================================================
 //  Method Name: getAccessToken:
 //  Return Type: NSString
@@ -405,56 +368,7 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
 
-    return [Utils nilObjectToBlankString:[objSession accessToken]];
-}
-
-//==========================================================================================
-//  Method Name: setSavedSession:
-//  Return Type: void
-//  Parameter  : LQSession: session
-
-//  description: set the session object
-//
-//  created by : Globallogic
-//==========================================================================================
--(void) setSavedSession:(LQSession *) session
-{
-    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-    {
-        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-    }
-    
-
-    [LQSession setSavedSession:session];
-}
-
-//==========================================================================================
-//  Method Name: savedSession:
-//  Return Type: LQSession
-//  Parameter  : 
-
-//  description: get the session object
-//
-//  created by : Globallogic
-//==========================================================================================
--(LQSession *) savedSession
-{
-    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-    {
-        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-    }
-    
-    if (objSession==nil)
-    {
-        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_NO_SESSION_CODE 
-                                             description:CONST_GEOLOQI_VALIDATION_NO_SESSION
-                                                  method:CONST_EMPTY_STRING];
-        
-        [m_delegate requestCompleteWithValidationError:error];
-        return nil;
-    }
-
-    return objSession;
+    return [Utils nilObjectToBlankString:[self.objSession accessToken]];
 }
 
 //==========================================================================================
@@ -476,6 +390,8 @@
     [LQSession sessionWithAccessToken:accessToken];
 }
 
+#pragma mark-
+#pragma mark Utility methods
 //==========================================================================================
 //  Method Name: appendSlashPrefixAtApiName:
 //  Return Type: NSString
@@ -485,7 +401,6 @@
 //
 //  created by : Globallogic
 //==========================================================================================
-
 -(NSString *) appendSlashPrefixAtApiName:(NSString *) strApiName
 {
     NSString *strSlash   =   [strApiName substringToIndex:1];
@@ -498,62 +413,13 @@
     return strApiName;
 }
 
-#pragma mark -
-#pragma mark APN Related methods
-//==========================================================================================
-//  Method Name: registerForPushNotificationsWithSuccessEventListner: errorEventListner:
-//  Return Type: void
-//  Parameter  : N.A. 
-//  description: Regeister for apple push notification        
-//
-//  created by : Globallogic
-//==========================================================================================
--(void) registerForPushNotificationsWithSuccessEventListner:(id) eventSuccess
-                                          errorEventListner:(id) eventError
-
-{
-    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-    {
-        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-    }
-    
-    [LQSession registerForPushNotificationsWithCallback:^(NSData *deviceToken, NSError *error) 
-    {
-        if(error)
-        {
-            [m_delegate requestCompleteWithError:error eventListner:eventError];
-        }
-        else
-        {
-            NSString *strDeviceToken            =   [NSString stringWithFormat:@"%@",deviceToken];
-            NSDictionary *responseDictionary    =  [NSDictionary dictionaryWithObject:strDeviceToken forKey:CONST_DEVICE_TOKEN];
-            [m_delegate requestCompleteWithSuccess:responseDictionary eventListner:eventSuccess];
-        }
-    }];
-}
-
-//==========================================================================================
-//  Method Name: applicationDidFinish: WithLaunchOptions:
-//  Return Type: void
-//  Parameter  : UIApplication : applictionObject
-//               id            : launchOptions
-//
-//  description: Need to be set while initilize        
-//
-//  created by : Globallogic
-//==========================================================================================
--(void) applicationDidFinish:(UIApplication *) applictionObject WithLaunchOptions:(id) launchOptions
-{
-    [LQSession application:applictionObject didFinishLaunchingWithOptions:launchOptions];
-}
-
 #pragma mark-
 #pragma mark new methods (SDK version 12.160) 
 
 //==========================================================================================
 //  Method Name: getUserID:
 //  Return Type: NSString
-//  Parameter  : id: args, this value will be ignored
+//  Parameter  : N.A.
 
 //  description: Returns the user id of authentic user
 //
@@ -566,9 +432,187 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
     
-    
     return [self.objSession userID];
 }
+
+#pragma pragma mark-
+#pragma mark Future methods, not implemented yet on geoloqi sdk
+
+//==========================================================================================
+//  Method Name: getUsername:
+//  Return Type: NSString
+//  Parameter  : N.A.
+
+//  description: Returns the user name of authentic user
+//
+//  NOTE: THIS PROPERTY IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(NSString *) getUsername
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    NSString *username    =   CONST_EMPTY_STRING;
+    
+    @try 
+    {
+        username =   [self.objSession username]; 
+    }
+    @catch (NSException *exception) 
+    {
+        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL 
+                                             description:[exception reason]
+                                                  method:CONST_EMPTY_STRING];
+        
+        [m_delegate requestCompleteWithValidationError:error];
+        
+    }
+    
+    return username;
+}
+
+
+//==========================================================================================
+//  Method Name: isAnonymous:
+//  Return Type: BOOL
+//  Parameter  : N.A.
+
+//  description: Is current session is anonymous
+//
+//  NOTE: THIS PROPERTY IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(BOOL) isAnonymous
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    BOOL isAnonymous    =   NO;
+    
+    @try 
+    {
+        isAnonymous =   [self.objSession isAnonymous]; 
+    }
+    @catch (NSException *exception) 
+    {
+        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL 
+                                             description:[exception reason]
+                                                  method:CONST_EMPTY_STRING];
+        
+        [m_delegate requestCompleteWithValidationError:error];
+        
+    }
+    
+    return isAnonymous;
+}
+
+//==========================================================================================
+//  Method Name: isLowBatteryTrackingEnabled:
+//  Return Type: BOOL
+//  Parameter  : N.A.
+
+//  description: Gets the current value of the low battery tracking preference
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(BOOL) isLowBatteryTrackingEnabled
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    BOOL isLowBatteryTrackingEnabled    =   NO;
+    
+    @try 
+    {
+        isLowBatteryTrackingEnabled =   [self.objSession isLowBatteryTrackingEnabled]; 
+    }
+    @catch (NSException *exception) 
+    {
+        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL 
+                                             description:[exception reason]
+                                                  method:CONST_EMPTY_STRING];
+        
+        [m_delegate requestCompleteWithValidationError:error];
+
+    }
+    
+    return isLowBatteryTrackingEnabled;
+}
+
+//==========================================================================================
+//  Method Name: enableLowBatteryTracking:
+//  Return Type: void
+//  Parameter  : N.A.
+
+//  description: Should enable low battery tracking preference.
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(void) enableLowBatteryTracking
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    @try 
+    {
+        [self.objSession enableLowBatteryTracking]; 
+    }
+    @catch (NSException *exception) 
+    {
+        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL 
+                                             description:[exception reason]
+                                                  method:CONST_EMPTY_STRING];
+        
+        [m_delegate requestCompleteWithValidationError:error];
+        
+    }
+}
+
+//==========================================================================================
+//  Method Name: disableLowBatteryTracking:
+//  Return Type: void
+//  Parameter  : N.A.
+
+//  description: Should disable low battery tracking preference.
+//
+//  NOTE: THIS METHOD IS NOT EXPOSED BY GEOLOQI SDK YET 
+//  created by : Globallogic
+//==========================================================================================
+-(void) disableLowBatteryTracking
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+
+    @try 
+    {
+        [self.objSession disableLowBatteryTracking]; 
+    }
+    @catch (NSException *exception) 
+    {
+        NSError *error =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_METHOD_CALL 
+                                             description:[exception reason]
+                                                  method:CONST_EMPTY_STRING];
+        
+        [m_delegate requestCompleteWithValidationError:error];
+        
+    }
+}
+
+#pragma pragma mark-
+#pragma mark Memory managment methods
 
 //==========================================================================================
 //  Method Name: dealloc
@@ -585,12 +629,8 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
 
-    NSLog(@"RequestHelper::dealloc called");            
-    m_delegate = nil;
-    
-//    [objSession release];
-//    objSession  =   nil;
-    
+    RELEASE_TO_NIL(self.objSession);
+        
     [super dealloc];
 }
 

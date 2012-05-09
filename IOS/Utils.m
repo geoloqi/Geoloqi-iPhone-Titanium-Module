@@ -1,10 +1,12 @@
-//
-//  Utils.m
-//  geoloqimodule
-//
-//  Created by globallogic on 09/04/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+/**
+ *  Utils.m
+ *  Titanium GeoLoqi IOS-Module
+ *
+ *  Created by Global-Logic GeoLoqi IOS Module Team on 09/05/2012.
+ *  Copyright 2012 Global Logic. All rights reserved.
+ *  Licensed under the terms of the Apache Public License
+ *  Please see the LICENSE included with this distribution for details.
+ */
 
 #import "Utils.h"
 #import "TiUtils.h"
@@ -47,15 +49,15 @@
     NSLog(@"Utils::getDictionaryFromErrorObject called");    
     NSMutableDictionary *dictError = [NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:@"%d",[objError code]],@"error_code",[NSString stringWithFormat:@"%@",[objError localizedDescription]],@"error_description",nil];
     
-    NSDictionary *respDict  =   [self getResponseDictionary:dictError];
-    return respDict;
+   // NSDictionary *respDict  =   [self getResponseDictionary:dictError];
+    return dictError;
 }
 
 //==========================================================================================
 //  Method Name: getStringValueFromKey
 //  Return Type: NSString
 //  Parameter  : NSString: key 
-//  description: Get the string value from interally saved 'dynprops'         
+//  description: Get the string value from passed dictionary         
 //
 //  created by : Globallogic
 //==========================================================================================
@@ -99,13 +101,13 @@
 //               NSString : desc
 //               NSString : method
 //
-//  description: Get the custom error object         
+//  description: Get the custom error object build using error code & description.         
 //
 //  created by : Globallogic
 //==========================================================================================
 +(NSError *) getErrorObjectWithCode:(NSInteger) code description:(NSString *) desc method:(NSString *) method
 {
-    NSError *objError   =   [NSError errorWithDomain:CONST_EMPTY_STRING code:code userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%@: %@",method,desc] forKey:NSLocalizedDescriptionKey]];
+    NSError *objError   =   [NSError errorWithDomain:CONST_EMPTY_STRING code:code userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%@",desc] forKey:NSLocalizedDescriptionKey]];
     return objError;
 }
 
@@ -115,7 +117,7 @@
 //  Parameter  : NSString : strClass
 //               NSString : strMessage
 //
-//  description: Get the log message         
+//  description: Print the log message         
 //
 //  created by : Globallogic
 //==========================================================================================
@@ -145,6 +147,93 @@
         return [NSDictionary dictionaryWithObject:dict forKey:@"response"];        
     }
 
+}
+
+//==========================================================================================
+//  Method Name: getTrakerProfileFromString
+//  Return Type: LQTrackerProfile
+//  Parameter  : NSString : strStrackingProfile
+//
+//  description: Get the tracker profile enum from string representation        
+//
+//  created by : Globallogic
+//==========================================================================================
++(LQTrackerProfile) getTrakerProfileFromString:(NSString *) strStrackingProfile
+{
+    //Default profile is off
+    LQTrackerProfile trackerProfile     =   LQTrackerProfileOff;
+    
+    if ([strStrackingProfile isEqualToString:CONST_GEOLOQI_LQTRACKER_PROFILE_OFF]) 
+    {
+        trackerProfile  =   LQTrackerProfileOff;
+    }
+    else if([strStrackingProfile isEqualToString:CONST_GEOLOQI_LQTRACKER_PROFILE_PASSIVE])
+    {
+        trackerProfile  =    LQTrackerProfilePassive;    
+    }
+    else if([strStrackingProfile isEqualToString:CONST_GEOLOQI_LQTRACKER_PROFILE_REALTIME])
+    {
+        trackerProfile  =    LQTrackerProfileRealtime;
+    }
+    else if([strStrackingProfile isEqualToString:CONST_GEOLOQI_LQTRACKER_PROFILE_LOGGING])
+    {
+        trackerProfile  =    LQTrackerProfileLogging;
+    }
+    
+    return trackerProfile;
+}
+
+//==========================================================================================
+//  Method Name: urlEncodedString
+//  Return Type: NSString ; Url encoded string
+//  Parameter  : NSString : strTargetString
+//
+//  description: Get the url encoded string from normal string       
+//
+//  created by : Globallogic
+//==========================================================================================
++(NSString *) urlEncodedString:(NSString *) strTargetString
+{
+    NSString *encodedString = (NSString *)CFURLCreateStringByAddingPercentEscapes(
+                                                                                  NULL,
+                                                                                  (CFStringRef)strTargetString,
+                                                                                  NULL,
+                                                                                  (CFStringRef)@"!*'();:@&=+$,/?%#[]",
+                                                                                  kCFStringEncodingUTF8 );
+    
+    return encodedString;
+    
+}
+
+//==========================================================================================
+//  Method Name: convertTheJsonObjectToqueryString
+//  Return Type: NSString; get the query string 
+//  Parameter  : NSDictionary : dictJsonObject
+//
+//  description: Get the query string from json object       
+//
+//  created by : Globallogic
+//==========================================================================================
++(NSString *) convertTheJsonObjectToqueryString:(NSDictionary *) dictJsonObject
+{
+    NSEnumerator *enumerator = [dictJsonObject keyEnumerator];
+
+    NSString *strOutput =   CONST_EMPTY_STRING;
+    
+    for(NSString *aKey in enumerator) 
+    {
+        if ([strOutput isEqualToString:CONST_EMPTY_STRING])
+        {
+            strOutput   =  [NSString stringWithFormat:@"%@=%@",aKey,[Utils urlEncodedString:[Utils getStringValueForDict:dictJsonObject fromKey:aKey]]]; 
+        }
+        else
+        {
+            strOutput   =  [NSString stringWithFormat:@"%@&%@=%@",strOutput,aKey,[Utils urlEncodedString:[Utils getStringValueForDict:dictJsonObject fromKey:aKey]]]; 
+        }
+    }
+
+    return strOutput;
+    
 }
 
 @end
