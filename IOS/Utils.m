@@ -163,6 +163,9 @@
     //Default profile is off
     LQTrackerProfile trackerProfile     =   LQTrackerProfileOff;
     
+    //MAKE THE STRING TO UPPERCASE TO MAKE CASE-INSENSITIVE SEARCH
+    strStrackingProfile =   [strStrackingProfile uppercaseString];
+    
     if ([strStrackingProfile isEqualToString:CONST_GEOLOQI_LQTRACKER_PROFILE_OFF]) 
     {
         trackerProfile  =   LQTrackerProfileOff;

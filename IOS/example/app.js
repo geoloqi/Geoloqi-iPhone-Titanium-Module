@@ -22,6 +22,8 @@ window.open();
 
 var geoloqi = require('ti.geoloqi');
 
+geoloqi.isLowBatteryTrackingEnabled();
+
 var objSession;
 
 geoloqi.init({
@@ -34,13 +36,20 @@ geoloqi.init({
              {
              onSuccess:function(e)
              {
-             objSession =   geoloqi.session;
+             objSession	=	geoloqi.session;
+             if (objSession==null)
+             {
+             alert("No Session Found");
+             }
+             else
+             {
+             alert("Session Found");
+             }	
              
-             alert(objSession.getUserId());
              },
              onFailure:function(e)
              {
-             alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+             alert(e.error_description);
              }
              }
              );
@@ -49,7 +58,7 @@ geoloqi.init({
 //EVENT LISTNERS
 geoloqi.addEventListener('onValidate',function(e){
                          //alert("Request completed");
-                         alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                         alert("[Validation Error] " + e.error_description);
                          });  
 
 var btnAutheticateUser=Ti.UI.createButton({
@@ -65,11 +74,19 @@ btnAutheticateUser.addEventListener('click',function(){
                                                              {
                                                              onSuccess:function(e)
                                                              {
-                                                             alert(e);
+                                                             objSession	=	geoloqi.session;
+                                                             if (objSession==null)
+                                                             {
+                                                             alert("No Session Found");
+                                                             }
+                                                             else
+                                                             {
+                                                             alert("Session Found");
+                                                             }
                                                              },
                                                              onFailure:function(e)
                                                              {
-                                                             alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                             alert(e);
                                                              }
                                                              }
                                                              );
@@ -90,11 +107,19 @@ btnAnonUser.addEventListener('click',function(){
                              geoloqi.createAnonymousUser({},{
                                                          onSuccess:function(e)
                                                          {
-                                                         alert(e);
+                                                         objSession	=	geoloqi.session;
+                                                         if (objSession==null)
+                                                         {
+                                                         alert("No Session Found");
+                                                         }
+                                                         else
+                                                         {
+                                                         alert("Session Found");
+                                                         }
                                                          },
                                                          onFailure:function(e)
                                                          {
-                                                         alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                         alert(e);
                                                          }
                                                          });
                              });
@@ -113,11 +138,19 @@ btnCreateUser.addEventListener('click',function(){
                                geoloqi.createUser({username:"tarunksharma",password:"12344321"},{
                                                   onSuccess:function(e)
                                                   {
-                                                  alert(e);
+                                                  objSession	=	geoloqi.session;
+                                                  if (objSession==null)
+                                                  {
+                                                  alert("No Session Found");
+                                                  }
+                                                  else
+                                                  {
+                                                  alert("Session Found");
+                                                  }
                                                   },
                                                   onFailure:function(e)
                                                   {
-                                                  alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                  alert(e);
                                                   }
                                                   });
                                });
@@ -148,7 +181,7 @@ var btnAPIRequest=Ti.UI.createButton({
                                      });
 
 btnAPIRequest.addEventListener('click',function(){
-                               objSession.apiRequest("GET","account/profile",{},
+                               geoloqi.session.apiRequest("GET","account/profile",{},
                                                           {
                                                           onSuccess:function(e)
                                                           {
@@ -156,7 +189,7 @@ btnAPIRequest.addEventListener('click',function(){
                                                           },
                                                           onFailure:function(e)
                                                           {
-                                                          alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                          alert(e);
                                                           }
                                                           });
                                
@@ -180,7 +213,7 @@ btnPost.addEventListener('click',function(){
                                                      },
                                                      onFailure:function(e)
                                                      {
-                                                     alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                     alert(e);
                                                      }
                                                      });
                          
@@ -204,7 +237,7 @@ btnGet.addEventListener('click',function(){
                                                    },
                                                    onFailure:function(e)
                                                    {
-                                                   alert("Error Description: " + e.error_description + "\n" + "Error Code: " + e.error_code);
+                                                   alert(e);
                                                    }
                                                    });
                         });
@@ -400,25 +433,6 @@ button12.addEventListener('click',function(){
 scrollViewer.add(button12);
 
 var button13=Ti.UI.createButton({
-                                title:'Object creation attempt',
-                                top:950,
-                                height:30,
-                                width:200
-                                });
-
-button13.addEventListener('click',function(){
-                          var abc = geoloqi.createLQTracker();
-                          alert("createLQTracker::"+ abc);
-                          var abc1 = geoloqi.createLQSession();
-                          alert("createLQSession::" + abc1);
-                          var abc2 = geoloqi.createiOS();
-                          alert("createiOS::" + abc2);
-                          alert("IF you get all three alert as undefined then its correct behavior");
-                          });
-
-scrollViewer.add(button13);
-
-var button14=Ti.UI.createButton({
                                 title:'Register for PUSH NOTIFICATION',
                                 top:1000,
                                 height:30,
@@ -434,7 +448,7 @@ var label = Ti.UI.createLabel({
 
 scrollViewer.add(label);
 
-button14.addEventListener('click',function(){ 
+button13.addEventListener('click',function(){ 
                           // register for push notifications
                           Titanium.Network.registerForPushNotifications({
                                                                         types: [
@@ -471,22 +485,22 @@ button14.addEventListener('click',function(){
                           
                           });
 
-scrollViewer.add(button14);
+scrollViewer.add(button13);
 
 //For Future methods will not work in ios
 
 //GetUserName
 var btnGetUserName=Ti.UI.createButton({
-                                title:'Get UserName',
-                                top:1200,
-                                height:30,
-                                width:200
-                                });
+                                      title:'Get UserName',
+                                      top:1200,
+                                      height:30,
+                                      width:200
+                                      });
 
 btnGetUserName.addEventListener('click',function(){
-                          var userName = geoloqi.session.getUsername();
-                          alert("UserName:"+ userName);
-                          });
+                                var userName = geoloqi.session.getUsername();
+                                alert("UserName:"+ userName);
+                                });
 
 scrollViewer.add(btnGetUserName);
 
@@ -507,15 +521,15 @@ scrollViewer.add(btnIsAnonymous);
 
 //isLowBatteryTrackingEnabled
 var btnIsLowBatteryTrackingEnabled=Ti.UI.createButton({
-                                      title:'isLowBatteryTrackingEnabled',
-                                      top:1300,
-                                      height:30,
-                                      width:200
-                                      });
+                                                      title:'isLowBatteryTrackingEnabled',
+                                                      top:1300,
+                                                      height:30,
+                                                      width:200
+                                                      });
 
 btnIsLowBatteryTrackingEnabled.addEventListener('click',function(){
-                                var isLowBatteryTrackingEnabled = geoloqi.isLowBatteryTrackingEnabled();
-                                alert("isLowBatteryTrackingEnabled:"+ isLowBatteryTrackingEnabled);
-                                });
+                                                var isLowBatteryTrackingEnabled = geoloqi.isLowBatteryTrackingEnabled();
+                                                alert("isLowBatteryTrackingEnabled:"+ isLowBatteryTrackingEnabled);
+                                                });
 
 scrollViewer.add(btnIsLowBatteryTrackingEnabled);

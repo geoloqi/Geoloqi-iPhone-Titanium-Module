@@ -33,6 +33,7 @@
 -(BOOL) isDebugOn;
 +(TiGeoloqiModule *) getCurrentObject;
 -(void) validationErrorOccuredWithError:(NSError *) err;
+-(void) sessionAuthenticated;
 
 /**
  * Initlize the geoloqi with a session & start tracking profile

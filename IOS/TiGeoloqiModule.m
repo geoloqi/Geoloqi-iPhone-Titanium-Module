@@ -78,6 +78,7 @@ static  TiGeoloqiModule *currentObject  =   nil;
 -(void)dealloc
 {
     RELEASE_TO_NIL(self.objRequestHelper);
+    RELEASE_TO_NIL(objLQSession);
     RELEASE_TO_NIL(objLQTracker);
     RELEASE_TO_NIL(objiOSProxy);
 	// release any resources that have been retained by the module
@@ -260,15 +261,14 @@ static  TiGeoloqiModule *currentObject  =   nil;
     if ([LQSession savedSession]!=nil) 
     {
         NSLog(@"Restoring Session");
-        [self.objRequestHelper setObjSession:[LQSession savedSession]];
-        [[LQTracker sharedTracker] setSession:[LQSession savedSession]];    
-        
+
+        [self sessionAuthenticated];
         [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:nil listener:success
                         thisObject:nil];
     }
     else
     {
-        
+
         [[LQTracker sharedTracker] setProfile:[Utils getTrakerProfileFromString:strTrackerProfile]];
         
         //CHECK IF USER HAS SET "allowAnonymousUsers" externally
@@ -289,10 +289,8 @@ static  TiGeoloqiModule *currentObject  =   nil;
             [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:nil listener:success
                             thisObject:nil];
         }
-        
     }
 }
-
 
 //==========================================================================================
 //  Method Name: authenticateUser
@@ -484,12 +482,10 @@ static  TiGeoloqiModule *currentObject  =   nil;
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
     
-    if (objLQSession==nil)
+    if (objLQSession!=nil)
     {
-        objLQSession    =   [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
-    }   
-    
-    [objLQSession.objRequestHelper setObjSession:[LQSession savedSession]];
+        [objLQSession.objRequestHelper setObjSession:[LQSession savedSession]];
+    }
     
     return objLQSession;
 }
@@ -504,10 +500,11 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(TiGeoloqiiOSProxy*)iOS
 {
-    if (objiOSProxy == nil)
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
-        objiOSProxy = [[TiGeoloqiiOSProxy alloc] init];
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
+    
     return objiOSProxy;
 }
 
@@ -521,11 +518,47 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(TiGeoloqiLQTrackerProxy*)tracker
 {
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    return objLQTracker;
+}
+
+//==========================================================================================
+//  Method Name: sessionAuthenticated
+//  Return Type: void
+//  Parameter  : N.A.
+//  description: If authenticated session found then init the proxy objects set the tracker profile & save the session       
+//
+//  created by : Globallogic
+//==========================================================================================
+-(void) sessionAuthenticated
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    //Initlize the proxy objects
+    if (objLQSession==nil)
+    {
+        objLQSession    =   [[TiGeoloqiLQSessionProxy alloc] init];
+    } 
+    
     if (objLQTracker == nil)
     {
         objLQTracker = [[TiGeoloqiLQTrackerProxy alloc] init];
     }
-    return objLQTracker;
+    
+    if (objiOSProxy == nil)
+    {
+        objiOSProxy = [[TiGeoloqiiOSProxy alloc] init];
+    }
+    
+    [self.objRequestHelper setObjSession:[LQSession savedSession]];
+    [[LQTracker sharedTracker] setSession:[LQSession savedSession]];  
 }
 
 #pragma pragma mark-
@@ -545,9 +578,14 @@ static  TiGeoloqiModule *currentObject  =   nil;
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
     
-
-    [self.objRequestHelper setObjSession:[LQSession savedSession]];
-    [[LQTracker sharedTracker] setSession:[LQSession savedSession]];        
+    [self sessionAuthenticated];
+//    if (objLQSession==nil)
+//    {
+//        objLQSession    =   [[[TiGeoloqiLQSessionProxy alloc] init] autorelease];
+//    } 
+//    
+//    [self.objRequestHelper setObjSession:[LQSession savedSession]];
+//    [[LQTracker sharedTracker] setSession:[LQSession savedSession]];        
     
         //else listner will always be passed 
     [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:[Utils getResponseDictionary:responseDictionary] listener:listner
