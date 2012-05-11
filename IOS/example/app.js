@@ -31,7 +31,7 @@ geoloqi.init({
              clientSecret: "db9181529c7922e6d23764c4614966b4",
              trackingProfile: "OFF",
              lowBatteryTracking: true,
-             allowAnonymousUsers:true
+             allowAnonymousUsers:false
              },
              {
              onSuccess:function(e)
@@ -135,7 +135,7 @@ var btnCreateUser=Ti.UI.createButton({
                                      });
 
 btnCreateUser.addEventListener('click',function(){
-                               geoloqi.createUser({username:"tarunksharma",password:"12344321"},{
+                               geoloqi.createUser({username:"test06",password:"1234"},{
                                                   onSuccess:function(e)
                                                   {
                                                   objSession	=	geoloqi.session;
@@ -229,7 +229,7 @@ var btnGet=Ti.UI.createButton({
                               width:200
                               });
 btnGet.addEventListener('click',function(){
-                        geoloqi.session.getRequest("location/history",{count:10,batch:true,accuracy:50,sort:'desc'},
+                        geoloqi.session.getRequest("location/last",{},
                                                    {
                                                    onSuccess:function(e)
                                                    {
@@ -420,14 +420,14 @@ button11.addEventListener('click',function(){
 scrollViewer.add(button11);
 
 var button12=Ti.UI.createButton({
-                                title:'setProfile(REALTIME)',
+                                title:'setProfile(LOGGING)',
                                 top:900,
                                 height:30,
                                 width:200
                                 });
 
 button12.addEventListener('click',function(){
-                          geoloqi.tracker.setProfile("REALTIME");
+                          geoloqi.tracker.setProfile("LOGGING");
                           });
 
 scrollViewer.add(button12);

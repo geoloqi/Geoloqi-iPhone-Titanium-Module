@@ -27,7 +27,6 @@
 //==========================================================================================
 -(id)init
 {
-    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__PRETTY_FUNCTION__]];
@@ -91,6 +90,8 @@
 //==========================================================================================
 -(void)setProfile:(id)args
 {
+        ENSURE_UI_THREAD_1_ARG(args);
+    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__PRETTY_FUNCTION__]];
