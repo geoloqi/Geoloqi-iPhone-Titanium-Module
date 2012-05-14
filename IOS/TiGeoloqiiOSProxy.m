@@ -32,7 +32,8 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__PRETTY_FUNCTION__]];
     }
     
-    [LQSession registerDeviceToken:[[TiUtils stringValue:[deviceTokenArray objectAtIndex:0]] dataUsingEncoding:NSUnicodeStringEncoding]];
+    //[LQSession registerDeviceToken:[[TiUtils stringValue:[deviceTokenArray objectAtIndex:0]] dataUsingEncoding:NSUnicodeStringEncoding]];
+    [LQSession registerDeviceToken:[deviceTokenArray objectAtIndex:0]];
 }
 
 
