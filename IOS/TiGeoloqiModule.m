@@ -271,6 +271,8 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //===================================================================================================================
 -(void) init:(id) args
 {
+    ENSURE_UI_THREAD_1_ARG(args);
+    
     //Check if previous session is available if ys then restore it else create anonymous sesssion
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
@@ -339,13 +341,14 @@ static  TiGeoloqiModule *currentObject  =   nil;
     else
     {
 
-        [[LQTracker sharedTracker] setProfile:[Utils getTrakerProfileFromString:strTrackerProfile]];
+        
         
         //CHECK IF USER HAS SET "allowAnonymousUsers" externally
         BOOL bAllowAnonymousUsers   =   [TiUtils boolValue:[dictConfig valueForKey:CONST_GEOLOQI_SERVICE_ALLOW_ANONYMOUS] def:YES];
         
         if (bAllowAnonymousUsers)
         {
+            [[LQTracker sharedTracker] setProfile:[Utils getTrakerProfileFromString:strTrackerProfile]];
             NSLog(@"Creating anonymous");
             //Set the profile given in init config
             //If no previous session available then call the create anon session 
@@ -373,6 +376,8 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(void) authenticateUser:(id) args
 {
+        ENSURE_UI_THREAD_1_ARG(args);
+    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
@@ -425,6 +430,9 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(void) createAnonymousUser:(id) args
 {
+    
+        ENSURE_UI_THREAD_1_ARG(args);
+    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
@@ -476,6 +484,9 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(void) createUser:(id) args
 {
+    
+        ENSURE_UI_THREAD_1_ARG(args);
+    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
@@ -606,6 +617,10 @@ static  TiGeoloqiModule *currentObject  =   nil;
 //==========================================================================================
 -(void) sessionAuthenticated
 {
+    
+    ENSURE_UI_THREAD_1_ARG(nil);
+
+    
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];

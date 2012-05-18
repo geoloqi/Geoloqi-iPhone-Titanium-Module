@@ -79,17 +79,17 @@
 ////
 ////  created by : Globallogic
 ////==========================================================================================
-//-(NSString *) getAccessToken:(id) args
-//{
-//    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-//    {
-//        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-//    }
-//
-//    
-//    return [self.objRequestHelper getAccessToken];
-//}
-//
+-(NSString *) getAccessToken:(id) args
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+
+    
+    return [self.objRequestHelper getAccessToken];
+}
+
 ////==========================================================================================
 ////  Method Name: accessToken: (Exposed as property)
 ////  Return Type: NSString
@@ -99,16 +99,16 @@
 ////
 ////  created by : Globallogic
 ////==========================================================================================
-//-(NSString *) accessToken
-//{
-//    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
-//    {
-//        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
-//    }
-//    
-//    
-//     return [self.objRequestHelper getAccessToken];
-//}
+-(NSString *) accessToken
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+    
+    
+     return [self.objRequestHelper getAccessToken];
+}
 
 
 
