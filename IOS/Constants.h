@@ -41,6 +41,11 @@
 #define CONST_GEOLOQI_SERVICE_REQUEST_FAILURE       @"onFailure"
 #define CONST_GEOLOQI_SERVICE_REQUEST_VALIDATION    @"onValidate"
 
+#define CONST_GEOLOQI_EVENT_ON_VALIDATE             @"onValidate"
+#define CONST_GEOLOQI_EVENT_LOCATION_CHANGED        @"onLocationChanged"
+#define CONST_GEOLOQI_EVENT_LOCATION_UPLOADED       @"onLocationUploaded"
+#define CONST_GEOLOQI_EVENT_TRACKER_PROFILE_CHANGED @"onTrackerProfileChanged"
+
 
 #define CONST_GEOLOQI_SERVICE_START_FAILURE   @"onServiceFailure"
 

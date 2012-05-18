@@ -15,15 +15,29 @@
 #import "TiUtils.h"
 #import "TiGeoloqiLQSessionProxy.h"
 #import <TiApp.h>
+#import <GeolocationModule.h>
 
+
+@interface TiGeoloqiModule ()
+
+-(void) _setUpEventListeners;
+-(void) _tearDownEventListeners;
+
+@end
+
+@interface GeolocationModule ()
+-(NSDictionary*)locationDictionary:(CLLocation*)newLocation;
+@end
 
 
 
 static  TiGeoloqiModule *currentObject  =   nil;
 
+
 @implementation TiGeoloqiModule
 
 @synthesize objRequestHelper;
+
 
 #pragma mark Internal
 
@@ -59,7 +73,9 @@ static  TiGeoloqiModule *currentObject  =   nil;
 	// this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
-	
+
+	[self _setUpEventListeners];
+    
 	//NSLog(@"[INFO] %@ loaded",self);
 }
 
@@ -69,6 +85,8 @@ static  TiGeoloqiModule *currentObject  =   nil;
 	// typically this is during shutdown. make sure you don't do too
 	// much processing here or the app will be quit forceably
 	
+    [self _tearDownEventListeners];
+    
 	// you *must* call the superclass
 	[super shutdown:sender];
 }
@@ -114,6 +132,58 @@ static  TiGeoloqiModule *currentObject  =   nil;
 		// since no body is listening at this point for that event
 	}
 }
+
+-(void) _sdkLocationChanged:(NSNotification *)sender 
+{
+    CLLocation *location = sender.object;
+    GeolocationModule *geoModule = [[GeolocationModule alloc] init];
+
+    [self fireEvent:CONST_GEOLOQI_EVENT_LOCATION_CHANGED 
+         withObject:[geoModule locationDictionary:location]];
+}
+
+-(void) _sdkDidUploadLocation:(NSNotification *)sender 
+{
+    [self fireEvent:CONST_GEOLOQI_EVENT_LOCATION_UPLOADED 
+         withObject:nil];
+}
+
+-(void) _sdkDidChangeTrackingProfile:(NSNotification *)sender 
+{
+    [self fireEvent:CONST_GEOLOQI_EVENT_TRACKER_PROFILE_CHANGED
+         withObject:nil];
+}
+
+-(void) _setUpEventListeners
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_sdkLocationChanged:)
+                                                 name:LQTrackerLocationChangedNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_sdkDidUploadLocation:)
+                                                 name:LQTrackerDidUploadLocationNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(_sdkDidChangeTrackingProfile:)
+                                                 name:LQTrackerDidChangeTrackingProfileNotification
+                                               object:nil];
+}
+
+-(void) _tearDownEventListeners
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self 
+                                                    name:LQTrackerLocationChangedNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self 
+                                                    name:LQTrackerDidUploadLocationNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self 
+                                                    name:LQTrackerDidChangeTrackingProfileNotification
+                                                  object:nil];
+    
+}
+
 
 //==========================================================================================
 //  Method Name: createProxy:forName:context:

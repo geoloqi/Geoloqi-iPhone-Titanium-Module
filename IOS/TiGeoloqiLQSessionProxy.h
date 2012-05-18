@@ -31,6 +31,11 @@
  */
 -(NSString *) getUserId:(id) args;
 
+/**
+ * Returns the access token of authenticated user
+ */
+-(NSString *) getAccessToken:(id) args;
+
 //Async call to geoloqi server
 /**
  * Make the request to geoloqi server
