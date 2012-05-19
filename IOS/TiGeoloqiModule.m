@@ -15,20 +15,15 @@
 #import "TiUtils.h"
 #import "TiGeoloqiLQSessionProxy.h"
 #import <TiApp.h>
-#import <GeolocationModule.h>
 
 
 @interface TiGeoloqiModule ()
 
 -(void) _setUpEventListeners;
 -(void) _tearDownEventListeners;
++(NSDictionary*)locationDictionary:(CLLocation*)newLocation;
 
 @end
-
-@interface GeolocationModule ()
--(NSDictionary*)locationDictionary:(CLLocation*)newLocation;
-@end
-
 
 
 static  TiGeoloqiModule *currentObject  =   nil;
@@ -136,10 +131,9 @@ static  TiGeoloqiModule *currentObject  =   nil;
 -(void) _sdkLocationChanged:(NSNotification *)sender 
 {
     CLLocation *location = sender.object;
-    GeolocationModule *geoModule = [[GeolocationModule alloc] init];
 
     [self fireEvent:CONST_GEOLOQI_EVENT_LOCATION_CHANGED 
-         withObject:[geoModule locationDictionary:location]];
+         withObject:[TiGeoloqiModule locationDictionary:location]];
 }
 
 -(void) _sdkDidUploadLocation:(NSNotification *)sender 
@@ -257,6 +251,33 @@ static  TiGeoloqiModule *currentObject  =   nil;
         [self fireEvent:CONST_GEOLOQI_SERVICE_REQUEST_VALIDATION 
              withObject:[Utils getDictionaryFromErrorObject:err]];
     }
+}
+
+//======================================================================
+// Return a dictionary representing the CLLocation object in the same
+// format as Titanium's geo module.
+//======================================================================
++(NSDictionary*)locationDictionary:(CLLocation*)newLocation
+{
+	if ([newLocation timestamp] == 0)
+	{
+		// this happens when the location object is essentially null (as in no location)
+		return nil;
+	}
+    
+	CLLocationCoordinate2D latlon = [newLocation coordinate];
+    
+	NSDictionary * data = [NSDictionary dictionaryWithObjectsAndKeys:
+						   [NSNumber numberWithFloat:latlon.latitude],@"latitude",
+						   [NSNumber numberWithFloat:latlon.longitude],@"longitude",
+						   [NSNumber numberWithFloat:[newLocation altitude]],@"altitude",
+						   [NSNumber numberWithFloat:[newLocation horizontalAccuracy]],@"accuracy",
+						   [NSNumber numberWithFloat:[newLocation verticalAccuracy]],@"altitudeAccuracy",
+						   [NSNumber numberWithFloat:[newLocation course]],@"heading",
+						   [NSNumber numberWithFloat:[newLocation speed]],@"speed",
+						   [NSNumber numberWithLongLong:(long long)([[newLocation timestamp] timeIntervalSince1970] * 1000)],@"timestamp",
+						   nil];
+	return data;
 }
 
 #pragma mark-
