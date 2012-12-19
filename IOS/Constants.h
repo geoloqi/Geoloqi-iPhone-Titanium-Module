@@ -26,7 +26,9 @@
 #define CONST_GEOLOQI_SERVICE_PASSWORD          @"password"
 #define CONST_GEOLOQI_SERVICE_TRACKING_PROFILE  @"trackingProfile"
 #define CONST_GEOLOQI_SERVICE_ALLOW_ANONYMOUS   @"allowAnonymousUsers"
-
+#define CONST_GEOLOQI_SERVICE_USER_KEY          @"key"
+#define CONST_GEOLOQI_SERVICE_USER_LAYERS       @"layerIds"
+#define CONST_GEOLOQI_SERVICE_USER_GROUPS       @"groupTokens"
 
 #pragma mark-
 #pragma mark Service Methods
