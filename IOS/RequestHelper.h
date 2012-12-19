@@ -77,7 +77,17 @@
 /**
  *  Configure the session for anonymous user
  */
--(void) createAnonymousAccountWithInfo:(NSDictionary *) object
+-(void) createAnonymousAccountWithInfo:(NSDictionary *)extraData
+                   successEventListner:(id) eventSuccess
+                     errorEventListner:(id) eventError;
+
+/**
+ *  Configure the session for anonymous user
+ */
+-(void) createAnonymousAccountWithInfo:(NSDictionary *) extraData
+                                   key:(NSString *) key
+                              layerIds:(NSArray *) layerIds
+                           groupTokens:(NSArray *) groupTokens
                    successEventListner:(id) eventSuccess
                      errorEventListner:(id) eventError;
 

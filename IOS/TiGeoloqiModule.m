@@ -333,9 +333,10 @@ static  TiGeoloqiModule *currentObject  =   nil;
     NSString *strAPIKey          =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_KEY];
     NSString *strAPISecret       =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_SECRET];  
     NSString *strTrackerProfile  =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_TRACKING_PROFILE];
-    
-    NSLog(@"apiKey: %d \n apiSecret: %d \n Tracking: %@",strAPIKey,strAPISecret,strTrackerProfile);
-    
+    NSString *strUserKey         =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_USER_KEY];
+    NSArray *arrUserLayerIds    =   [dictConfig valueForKey:CONST_GEOLOQI_SERVICE_USER_LAYERS];
+    NSArray *arrUserGroupTokens =   [dictConfig valueForKey:CONST_GEOLOQI_SERVICE_USER_GROUPS];
+
     //CHECK IF API SECRET & KEY IS NOT PASSED BY DEVELOPER THEN THROW ERROR THAT MANDATORY 
     //PARAMETERS ARE NOT AVAILABLE
     if (([strAPIKey isEqualToString:CONST_EMPTY_STRING]) || ([strAPISecret isEqualToString:CONST_EMPTY_STRING]))
@@ -373,7 +374,10 @@ static  TiGeoloqiModule *currentObject  =   nil;
             NSLog(@"Creating anonymous");
             //Set the profile given in init config
             //If no previous session available then call the create anon session 
-            [self.objRequestHelper createAnonymousAccountWithInfo:nil 
+            [self.objRequestHelper createAnonymousAccountWithInfo:nil
+                                                              key:strUserKey
+                                                         layerIds:arrUserLayerIds
+                                                      groupTokens:arrUserGroupTokens
                                               successEventListner:success 
                                                 errorEventListner:error];
         }
