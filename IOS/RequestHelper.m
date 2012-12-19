@@ -282,7 +282,7 @@
 //
 //  created by : Globallogic
 //==========================================================================================
--(void) createAnonymousAccountWithInfo:(NSDictionary *) object
+-(void) createAnonymousAccountWithInfo:(NSDictionary *)extraData
                    successEventListner:(id) eventSuccess
                      errorEventListner:(id) eventError
 
@@ -292,7 +292,7 @@
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
     }
     
-    [LQSession createAnonymousUserAccountWithUserInfo:object
+    [LQSession createAnonymousUserAccountWithUserInfo:extraData
                                             completion:^(LQSession *session , NSError *error ) 
       {
           if(session.accessToken) 
@@ -307,6 +307,49 @@
               [m_delegate requestCompleteWithError:error eventListner:eventError];
           }
       }];
+}
+
+//==========================================================================================
+//  Method Name: configureAnonymousAccountWithInfo: key: layerIds: groupTokens: successEventListner: errorEventListner:
+//  Return Type: void
+//  Parameter  : id      : eventSuccess
+//               id      : eventError
+
+//  description: Configure the session for anonymous user
+//
+//  created by : Josh
+//==========================================================================================
+-(void) createAnonymousAccountWithInfo:(NSDictionary *) extraData
+                                   key:(NSString *) key
+                              layerIds:(NSArray *) layerIds
+                           groupTokens:(NSArray *) groupTokens
+                   successEventListner:(id) eventSuccess
+                     errorEventListner:(id) eventError
+
+{
+    if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
+    {
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+    }
+
+    [LQSession createAnonymousUserAccountWithUserInfo:extraData
+                                                  key:key
+                                             layerIds:layerIds
+                                          groupTokens:groupTokens
+                                           completion:^(LQSession *session , NSError *error )
+                                           {
+                                               if(session.accessToken)
+                                               {
+                                                   [LQSession setSavedSession:session];
+                                                   [self setObjSession:session];
+                                                   [m_delegate requestCompleteWithSuccess:nil eventListner:eventSuccess];
+                                               }
+                                               else
+                                               {
+                                                   NSLog(@"createAnonymousAccountWithInfo %@",[error localizedDescription]);
+                                                   [m_delegate requestCompleteWithError:error eventListner:eventError];
+                                               }
+                                           }];
 }
 
 //==========================================================================================
