@@ -56,13 +56,29 @@
 //==========================================================================================
 -(void) setAPIKey:(NSString *) apiKey secret:(NSString *) apiSecret
 {
+     [self setAPIKey:apiKey];
+}
+
+//==========================================================================================
+//  Method Name: setAPIKey
+//  Return Type: void
+//  Parameter  : NSString: apiKey
+
+//  description: Set the API key
+//
+//  created by : Josh
+//==========================================================================================
+-(void) setAPIKey:(NSString *) apiKey
+{
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"apiKey: %@", apiKey]];
     }
 
-     [LQSession setAPIKey:apiKey secret:apiSecret];   
+    [LQSession setAPIKey:apiKey];
 }
+
 
 
 #pragma mark-
@@ -330,6 +346,9 @@
     if ([[TiGeoloqiModule getCurrentObject] isDebugOn])
     {
         [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"key: %@", key]];
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"layerIds: %@", layerIds]];
+        [Utils printLogWithClassName:NSStringFromClass([self class]) message:[NSString stringWithFormat:@"groupTokens: %@", groupTokens]];
     }
 
     [LQSession createAnonymousUserAccountWithUserInfo:extraData
