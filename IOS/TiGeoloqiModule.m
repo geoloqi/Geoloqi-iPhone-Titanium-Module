@@ -331,40 +331,34 @@ static  TiGeoloqiModule *currentObject  =   nil;
     NSMutableDictionary *dictConfig =   (NSMutableDictionary *)[args objectAtIndex:0];
     
     NSString *strAPIKey          =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_KEY];
-    NSString *strAPISecret       =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_API_SECRET];  
     NSString *strTrackerProfile  =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_TRACKING_PROFILE];
     NSString *strUserKey         =   [Utils getStringValueForDict:dictConfig fromKey:CONST_GEOLOQI_SERVICE_USER_KEY];
+    
     NSArray *arrUserLayerIds    =   [dictConfig valueForKey:CONST_GEOLOQI_SERVICE_USER_LAYERS];
     NSArray *arrUserGroupTokens =   [dictConfig valueForKey:CONST_GEOLOQI_SERVICE_USER_GROUPS];
 
     //CHECK IF API SECRET & KEY IS NOT PASSED BY DEVELOPER THEN THROW ERROR THAT MANDATORY 
     //PARAMETERS ARE NOT AVAILABLE
-    if (([strAPIKey isEqualToString:CONST_EMPTY_STRING]) || ([strAPISecret isEqualToString:CONST_EMPTY_STRING]))
+    if (([strAPIKey isEqualToString:CONST_EMPTY_STRING]))
     {
         NSError *objError   =   [Utils getErrorObjectWithCode:CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET_CODE
                                                   description:CONST_GEOLOQI_VALIDATION_INVALID_API_KEY_SECRET 
                                                        method:CONST_EMPTY_STRING];
-        
+
         [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_FAILURE withObject:[Utils getDictionaryFromErrorObject:objError] listener:error thisObject:nil];        
         return;
     }
     
-    
-    [self.objRequestHelper setAPIKey:strAPIKey secret:strAPISecret];
+    [self.objRequestHelper setAPIKey:strAPIKey];
     
     if ([LQSession savedSession]!=nil) 
     {
-        NSLog(@"Restoring Session");
-
         [self sessionAuthenticated];
         [self _fireEventToListener:CONST_GEOLOQI_SERVICE_REQUEST_SUCCESS withObject:nil listener:success
                         thisObject:nil];
     }
     else
     {
-
-        
-        
         //CHECK IF USER HAS SET "allowAnonymousUsers" externally
         BOOL bAllowAnonymousUsers   =   [TiUtils boolValue:[dictConfig valueForKey:CONST_GEOLOQI_SERVICE_ALLOW_ANONYMOUS] def:YES];
         

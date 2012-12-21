@@ -48,6 +48,12 @@
  */
 -(void) setAPIKey:(NSString *) apiKey secret:(NSString *) apiSecret;
 
+/**
+ * Set the API key & secret
+ */
+-(void) setAPIKey:(NSString *) apiKey;
+
+
 //Async  call to Geoloqi
 
 /**
